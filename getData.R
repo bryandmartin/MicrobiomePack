@@ -38,8 +38,13 @@ getPurt <- function(Wi,base,p=0.05) {
   # nonzeros <- which(Wi != 0)
   Q <- length(Wi)
   Z.purt <- rep(0,Q)
-  Z.purt[zeros] <- (Wi[zeros]+p) / (sum(Wi)+p*nz)
-  Z.purt[-zeros] <- (Wi[-zeros]) / (sum(Wi)+p*nz)
+  if(nz != 0) {
+    Z.purt[zeros] <- (Wi[zeros]+p) / (sum(Wi)+p*nz)
+    Z.purt[-zeros] <- (Wi[-zeros]) / (sum(Wi)+p*nz)
+  } else {
+    Z.purt <- Wi / sum(Wi)
+  }
+
   # Return Y.purt
   return(log(Z.purt[-base]/Z.purt[base]))
 }
@@ -56,9 +61,24 @@ logratios <- function(W,base,p=0.05) {
   return(Y.purt)
 }
 
+
+#### Recall: W is raw data
+#### Y is logratios
+
 W <- as.matrix(data[,-1])
 
+whichpart <- function(x, n=75) {
+  nx <- length(x)
+  p <- nx-n
+  xp <- sort(x, partial=p)[p]
+  return(which(x > xp))
+}
 
-Y.p <- logratios(W,base=100,p=0.05)
+W <- W[,whichpart(colSums(W),n=75)]
+
+## Fornow, debugging, lets take top 75
+
+
+#Y.p <- logratios(W,base=100,p=0.05)
 
 

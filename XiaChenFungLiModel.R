@@ -1,47 +1,123 @@
+require(doParallel)
+require(abind)
+require(doSNOW)
+require(PDSCE)
+
 ######## FUNCTION ########
 #### MC Step for a row
-MCrow <- function(Yi,Wi,eYi,Q,base,sigma,MCiter,MCburn,stepsize=1) {
-  Yi.MH <- matrix(0,MCiter,Q-1)
-  aCount <- 0
+MCrow <- function(Yi,Wi,eYi,Q,base,sigInv,MCiter,stepsize=1) {
+  # extra column for acceptance indicator
+  Yi.MH <- matrix(0,MCiter,Q)
   for(i in 1:MCiter) {
     # proposal
     Yi.star <- Yi + rnorm(Q-1,0,stepsize)
     # denominator
-    Log_pt1 <- sum(Wi)*(log(sum(exp(Yi))+1)
-                        -log(sum(exp(Yi.star))+1))
+    Eq5pt1 <- sum(Wi)*(log(sum(exp(Yi))+1)
+                       -log(sum(exp(Yi.star))+1))
     # numerator
-    Log_pt2 <- sum(Wi[-base]*(Yi.star-Yi))
-    Log_pt3 <- -0.5*crossprod((Yi.star-eYi),solve(sigma))%*%(Yi.star-eYi)
-    Log_pt4 <- -0.5*crossprod((Yi-eYi),solve(sigma))%*%(Yi-eYi)
-    R_ratio <- Log_pt1+Log_pt2+Log_pt3-Log_pt4
-    acceptance <- min(1,exp(R_ratio))
+    Eq5pt2 <- sum(Wi[-base]*(Yi.star-Yi))
+    Eq5pt3 <- -0.5*crossprod((Yi.star-eYi),sigInv)%*%(Yi.star-eYi)
+    Eq5pt4 <- -0.5*crossprod((Yi-eYi),sigInv)%*%(Yi-eYi)
+    fullRat <- Eq5pt1+Eq5pt2+Eq5pt3-Eq5pt4
+    acceptance <- min(1,exp(fullRat))
     temp <- runif(1)
+    aVal <- 0
     if(temp < acceptance) {
       Yi <- Yi.star
-      aCount <- aCount + 1
+      aVal <- 1
     }
-    Yi.MH[i,] <- Yi
+    # each row is a resampling of Yi, first col is whether accepted or not
+    Yi.MH[i,] <- c(aVal,Yi)
   }
-  Yi.new <- apply(Yi.MH[(MCburn+1):MCiter,],2,mean)
-  ## returns a vector where first entry is acceptance rate, for ease of apply
-  return(c(aCount/MCiter,Yi.new))
+  
+  ## returns a matrix
+  #### Yi.MH: MH samples of row, first column ind if accepted (MCiter rows, Q cols)
+  return(Yi.MH)
 }
+
+
+# helper
+acomb3 <- function(...) abind(...,along=3)
 
 ######## FUNCTION ########
-#### Get MC matrix, acceptance
-MCmat <- function(Y,W,eY,base,sigma,MCiter,MCburn,stepsize=1) {
-  Q <- ncol(Y) + 1
-  Y.MH <- sapply(1:nrow(W), function(i) MCrow(Yi=Y[i,],Wi=W[i,],eYi=eY[i,],base=base,sigma=sigma,MCiter=MCiter,MCburn=MCburn,stepsize=stepsize))
+#### Get array
+#### Dim 1 and 2 match MCrow
+#### Dim 3 goes across rows of data (samples)
+MCmat <- function(Y,W,eY,N,Q,base,sigma,MCiter,stepsize=1) {
+  #sigInv <- solve(sigma)
+  sigInv <- chol2inv(chol(sigma))
+  
+  MH_path <- function(i) {
+    MCrow(Yi=Y[i,],Wi=W[i,],eYi=eY[i,],Q=Q,base=base,sigInv=sigInv,MCiter=MCiter,stepsize=stepsize)
+  }
+  registerDoParallel(detectCores())
+  Y.MH <-
+    foreach(i=1:N,.combine='acomb3',.multicombine=TRUE) %dopar% {
+      MH_path(i)
+    }
+  
+  stopImplicitCluster()
+  # Should be (MCiter x Q x N)
+  # Dont forget, first column is acceptance
+  return(Y.MH)
+}
+
+#### Now have: MH samples of Y
+#### Now need to: estimate parameters (M-step)
+#### #### This requires: Calculations for the arguments of previous functions
+#### #### And then: Plug in functions, follow formulas for estimates
+
+
+
+######## FUNCTION ########
+#### Do EM
+LNM.EM <- function(W,base,EMiter=10,MCiter=1000,MCburn,stepsize=1,p=0.05) {
+  # Base is value of D, stepsize is for MH, p is purturb
+  # Just take in W, calculate Y, eY, sigma
+  # Don't need X yet, those are covariates
+  W <- as.matrix(W)
+  
+  ### ROWS COLUMNS
+  # N is samples, Q is OTUs
+  N <- nrow(W); Q <- ncol(W)
+  # purturbed Y (N x Q-1) - function in getData.R
+  Y.p <- logratios(W,base=base,p=p)
+  # this is just column means (of OTUs)
+  b0 <- attr(Y.p,"center")
+  # This works only with no covariates
+  # Recall tcrossprod is x %*% t(y)
+  # N x 1 %*% 1 %*% Q
+  # eY is constant across columns
+  eY <- tcrossprod(rep(1,N), b0)
+  
+  # (Q-1) x (Q-1)
+  sigma <- var(Y.p-eY)
+  
+  # Should be (MCiter x Q x N)
+  # (3 x 75 x 119)
+  # Dont forget, first column is acceptance
+  for(em in 1:EMiter) {
+    MCarray <- MCmat(Y=Y.p,W=W,eY=eY,N=N,Q=Q,base=base,sigma=sigma,MCiter=MCiter,stepsize=stepsize)
+    
+    # Extract MH samples of Y using mean, want (N x Q-1)
+    # Each row corresponds to 3rd dim of array
+    
+    # Yi.new <- apply(Yi.MH[(MCburn+1):MCiter,],2,mean)
+    
+    
+    # update beta, sigma
+    # Recall: b0 is means across OTUs
+    b0 <- apply()
+  }
+  
+  
 }
 
 
-b0 <- attr(Y.p,"center")
-View(rep(1,7769)%*%t(b0))
-Center should be column means of purtubations
-With no covariates, this is EY
-# Equation 1, get additive logratio
 
 
+# grab for debug:
+base=50;EMiter=10;MCiter=3;MCburn=1;stepsize=1;p=0.05;
 
 
 
