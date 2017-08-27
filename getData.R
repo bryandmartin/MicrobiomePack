@@ -74,7 +74,7 @@ whichpart <- function(x, n=75) {
   return(which(x > xp))
 }
 
-W <- W[,whichpart(colSums(W),n=75)]
+
 
 ## Fornow, debugging, lets take top 75
 
