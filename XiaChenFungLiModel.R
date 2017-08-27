@@ -50,13 +50,13 @@ MCmat <- function(Y,W,eY,N,Q,base,sigma,MCiter,stepsize=1) {
   MH_path <- function(i) {
     MCrow(Yi=Y[i,],Wi=W[i,],eYi=eY[i,],Q=Q,base=base,sigInv=sigInv,MCiter=MCiter,stepsize=stepsize)
   }
-  registerDoParallel(detectCores())
+  #registerDoParallel(detectCores())
   Y.MH <-
-    foreach(i=1:N,.combine='acomb3',.multicombine=TRUE) %dopar% {
+    foreach(i=1:N,.combine='acomb3',.multicombine=TRUE) %do% {
       MH_path(i)
     }
   
-  stopImplicitCluster()
+  #stopImplicitCluster()
   # Should be (MCiter x Q x N)
   # Dont forget, first column is acceptance
   return(Y.MH)
@@ -94,20 +94,37 @@ LNM.EM <- function(W,base,EMiter=10,MCiter=1000,MCburn,stepsize=1,p=0.05) {
   sigma <- var(Y.p-eY)
   
   # Should be (MCiter x Q x N)
-  # (3 x 75 x 119)
-  # Dont forget, first column is acceptance
+  # (1000 x 75 x 119)
+  # Dont forget, first column is acceptance (ie want 74 x 119 for data)
   for(em in 1:EMiter) {
     MCarray <- MCmat(Y=Y.p,W=W,eY=eY,N=N,Q=Q,base=base,sigma=sigma,MCiter=MCiter,stepsize=stepsize)
     
-    # Extract MH samples of Y using mean, want (N x Q-1)
-    # Each row corresponds to 3rd dim of array
+    # should call 119 apply functions, each time, get 75 means. each of iteration values for OTU.
+    # ORIGINAL
+    # for(i in 1:119) {
+    #   Y.new[i,] <- apply(MCarray[(MCburn+1):MCiter,,i],2,mean)
+    # }
+    # ALTERNATIVE, no for loop if large N, but transpose:
+    # seems faster by system.time
+    Y.new <- t(apply(MCarray[(MCburn+1):MCiter,,],3,colMeans))
     
-    # Yi.new <- apply(Yi.MH[(MCburn+1):MCiter,],2,mean)
-    
+    # recall first column
+    accepts <- Y.new[,1]
+    Y.new <- Y.new[,2:Q]
     
     # update beta, sigma
     # Recall: b0 is means across OTUs
-    b0 <- apply()
+    b0 <- apply(Y.new,2,mean)
+    
+    sigSums <- matrix(0,Q-1,Q-1)
+    # Get all sample matrices
+    for(i in (MHburn+1):MCiter) {
+      # first part is Y sample
+      Eps.samp <- t(MCarray[i,2:Q,1:N]) - eY
+      sigSums <- sigSums + crossprod(Eps.samp)
+    }
+    ## CAN EASILY MAKE ABOVE APPLY: next just take mean
+    
   }
   
   
@@ -117,9 +134,8 @@ LNM.EM <- function(W,base,EMiter=10,MCiter=1000,MCburn,stepsize=1,p=0.05) {
 
 
 # grab for debug:
-base=50;EMiter=10;MCiter=3;MCburn=1;stepsize=1;p=0.05;
+base=50;EMiter=10;MCiter=100;MCburn=50;p=0.05;stepsize=0.01
 
 
 
-
-save.image("microbiome.RData")
+# save.image("microbiome.RData")
