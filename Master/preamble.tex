@@ -1,0 +1,370 @@
+
+\usepackage{import}
+
+\usepackage{microtype}
+
+\usepackage{setspace}
+
+\usepackage{amsmath}
+
+\usepackage{amsfonts}
+
+\usepackage{amssymb}
+\usepackage{bbm}
+\usepackage{graphicx}
+
+\usepackage{hyperref}
+
+\usepackage{breqn}
+
+\usepackage{color}
+
+\usepackage{listings}
+
+% Set various options for exam package
+
+
+% Set lesson name, etc.
+
+
+
+\usepackage{enumitem}
+
+
+% Set headers/footers to look nice
+
+
+
+
+
+% Define commands related to marking up content
+
+\newcommand{\source}[1]{}
+
+\allowdisplaybreaks
+
+% Define commands related to general mathematical style
+
+%\renewcommand{\exp}[1]{e^{#1}}
+\renewcommand{\exp}[1]{\text{exp}\left\{#1\right\}}
+
+\newcommand{\beq}{\begin{equation}}
+
+\newcommand{\eeq}{\end{equation}}
+
+\newcommand{\bpart}{\begin{parts}}
+
+\newcommand{\epart}{\end{parts}}
+
+\newcommand{\bsol}{\begin{solution}}
+
+\newcommand{\esol}{\end{solution}}
+
+\newcommand{\for}{\text{\ for\ }}
+
+\def\bal#1\eal{\begin{align*}#1\end{align*}}
+
+\newcommand{\bmat}{\begin{pmatrix}}
+
+\newcommand{\emat}{\end{pmatrix}}
+
+\newcommand{\tab}{\hspace*{2em}}
+\newcommand{\wrd}[1]{\hspace{-1in}\text{#1}}
+
+
+  \newcommand{\intinf}{\int_{0}^{\infty}}
+    \newcommand{\intinff}{\int_{-\infty}^{\infty}}
+  \newcommand{\vertinf}{\vert_{0}^{\infty}}
+\newcommand{\pois}{\text{Poisson}}
+\newcommand{\bin}{\text{Bin}}
+\newcommand{\pole}{\Big{|}}
+\newcommand{\sumi}{\sum_{i=1}^n}
+\newcommand{\sumj}{\sum_{j=1}^n}
+\newcommand{\sumk}{\sum_{k=1}^n}
+
+\newcommand{\prodi}{\prod_{i=1}^n}
+\usepackage{afterpage}
+\newcommand{\npdf}{\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x_i-\mu)^2}{2\sigma^2}}}
+\newcommand{\parthe}[1]{\frac{\partial}{\partial #1}}
+\newcommand\blankpage{%
+    \null
+    \thispagestyle{empty}%
+    \addtocounter{page}{-1}%
+    \newpage}
+\newcommand{\var}[1]{\text{Var}\paren{#1}}
+\newcommand{\skw}{\text{Skew}}
+\newcommand{\kurt}{\text{Kurt}}
+\newcommand{\corr}{\text{corr}}
+\newcommand{\cov}{\text{Cov}}
+\newcommand{\ind}{\mathbf{1}}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\B}{\mathcal{B}}
+\renewcommand{\P}{\mathcal{P}}
+\newcommand{\E}{\mathcal{E}}
+\newcommand{\U}{\mathcal{U}}
+\renewcommand{\L}{\mathcal{L}}
+\newcommand{\bone}{\ind}
+\newcommand{\J}{\mathcal{J}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\I}{\mathbb{I}}
+\newcommand{\indep}{\rotatebox[origin=c]{90}{$\models$}}
+\newcommand{\myqed}{\text{\rule{3ex}{3ex}
+\hspace{-.25in}
+\textcolor{white}{$\mathcal{B}$}}}
+\newcommand{\paren}[1]{\left(#1\right)}
+\renewcommand{\brack}[1]{\left[#1\right]}
+\usepackage{verbatim}
+\newcommand{\abs}[1]{\left\vert #1 \right\vert}
+
+\renewcommand{\exp}[1]{\text{exp}\left\{#1\right\}}
+\newcommand{\mle}[1]{\hat{#1}_{MLE}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\st}{\text{ s.t. }}
+\newcommand{\parder}[2]{\dfrac{\partial #1}{\partial #2}}
+\newcommand{\aveX}{\overline{X}_n}
+\makeatletter
+\newcommand{\pushright}[1]{\ifmeasuring@#1\else\omit\hfill$\displaystyle#1$\fi\ignorespaces}
+\newcommand{\pushleft}[1]{\ifmeasuring@#1\else\omit$\displaystyle#1$\hfill\fi\ignorespaces}
+\makeatother
+\usepackage{mathtools}
+\newcommand{\defeq}{\vcentcolon=}
+\newcommand{\eqdef}{=\vcentcolon}
+
+\renewcommand{\hat}[1]{\widehat{#1}}
+\newcommand{\sigest}{\hat{\sigma}_n^2}
+\newcommand{\thest}{\hat{\theta}_n}
+\newcommand{\bo}{\hat{\beta}_1}
+\newcommand{\bz}{\hat{\beta}_0}
+\newcommand{\hbo}{\hat{\beta}_1}
+\newcommand{\hbz}{\hat{\beta}_0}
+\renewcommand{\bar}{\overline}
+
+\renewcommand{\tilde}[1]{\widetilde{#1}}
+\renewcommand{\v}[1]{\vec{#1}}
+\renewcommand{\b}[1]{\mathbf{#1}}
+\newcommand{\hv}[1]{\hat{\vec{#1}}}
+\newcommand{\h}[1]{\hat{#1}}
+\newcommand{\hvb}{\hat{\vec{\beta}}}
+\newcommand{\hvt}{\hat{\vec{\theta}}}
+\usepackage{enumitem}
+
+\newcommand{\dater}[1]{ \vspace{.05in}   \hrule
+    \vspace{.05in}
+    \hrule 
+    \vspace{0.05in}
+    \noindent{\framebox{\large{\textbf{#1}}}}}
+    
+\newcommand{\daternew}[1]{
+    \noindent{\framebox{\large{\textbf{#1}}}}}
+    
+    
+\usepackage{listings}
+\newcommand{\argmin}{\operatornamewithlimits{argmin}}
+\newcommand{\argmax}{\operatornamewithlimits{argmax}}
+\newcommand{\argsup}{\operatornamewithlimits{argsup}}
+\newcommand{\vcm}[4]{\begin{pmatrix} #1& #2\\ #3 & #4\end{pmatrix}}
+\newcommand{\toinp}{\stackrel{p}{\to}}
+\newcommand{\towithn}{\stackrel{n\to\infty}{\to}}
+\newcommand{\toind}{\stackrel{d}{\to}}
+\newcommand{\hbv}{\hat{\vec{\beta}}}
+\newcommand{\xtxi}{\paren{\b{X}^T\b{X}}^{-1}}
+\newcommand{\va}{\vec{a}}
+\newcommand{\vat}{\vec{a}^T}
+\newcommand{\vb}{\vec{\beta}}
+\newcommand{\xt}{\b{X}^T}
+\newcommand{\ve}{\vec{\eps}}
+\newcommand{\xtvxi}{\paren{\b{X}^T\b{V}^{-1}\b{X}}^{-1}}
+\newcommand{\ba}{\b{A}}
+\newcommand{\bx}{\b{X}}
+\newcommand{\ytay}{\v{Y}^T\b{A}\v{Y}}
+\newcommand{\ntp}{n \times p}
+\newcommand{\ntn}{n \times n}
+\newcommand{\vy}{\vec{Y}}
+\newcommand{\bv}{\b{V}}
+\newcommand{\hb}{\hat{\beta}}
+\newcommand{\vt}{\v{\theta}}
+\newcommand{\vp}{\v{\psi}}
+\newcommand{\iid}{\stackrel{iid}{\sim}}
+
+\newcommand{\hth}{\hat{\theta}}
+
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\supp}{\text{supp}}
+\newcommand{\grapher}[2]{\centerline{\includegraphics[width=#2]{#1}}}
+
+\newcommand{\sign}{\text{sign}}
+\newcommand{\ip}[1]{\left\langle #1 \right\rangle}
+
+\renewcommand{\h}[1]{\hat{#1}}
+\newcommand\norm[1]{\left\lVert#1\right\rVert}
+
+\newcommand{\bj}{\b{J}}
+
+\newcommand{\vu}{\v{\U}}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%Johnny's commands
+% environments
+\newcommand{\bp}{\begin{pmatrix}}
+\newcommand{\ep}{\end{pmatrix}}
+\newcommand{\bcas}{\begin{cases}}
+\newcommand{\ecas}{\end{cases}}
+% convergence
+\newcommand{\dto}{\stackrel{d}{\to}}
+\newcommand{\pto}{\stackrel{p}{\to}}
+\newcommand{\asto}{\stackrel{\text{a.s.}}{\to}}
+\newcommand{\pwto}{\stackrel{\text{p.w.}}{\to}}
+\newcommand{\nto}{\stackrel{\text{n}}{\to}}
+% text
+\newcommand{\mcal}[1]{\mathcal{#1}}
+\newcommand{\tbf}[1]{\textbf{#1}}
+\newcommand{\mbf}[1]{\mathbf{#1}}
+% derivatives
+\newcommand{\pardder}[2]{\frac{\partial^2 #1}{\partial #2^2}}
+\newcommand{\pardderp}[2]{\frac{\partial^2 #1}{\partial \left(#2 \right)^2}}
+% distributions
+\newcommand{\Bern}[1]{\mathcal{B} \left( #1 \right)}
+\newcommand{\Unif}[1]{\mathcal{U} \left( #1 \right)}
+\newcommand{\Norm}[1]{\mathcal{N} \left( #1 \right)}
+\newcommand{\Exp}[1]{\mathcal{E} \left( #1 \right)}
+\newcommand{\Pois}[1]{Pois \left( #1 \right)}
+\newcommand{\LNorm}[1]{\mathcal{LN} \left( #1 \right)}
+\newcommand{\Gam}[1]{\Gamma \left( #1 \right)}
+% others
+\newcommand{\asim}{\stackrel{\cdot}{\sim}}
+\newcommand{\defn}{\coloneqq}
+
+\usepackage{bigints}
+
+\newcommand{\vly}{\v{y}}
+\newcommand{\bint}{\bigintsss}
+
+\let\oldemptyset\emptyset
+\let\emptyset\varnothing
+
+
+\newcommand{\betad}[1]{\text{Beta}\paren{#1}}
+
+\newcommand{\hp}{\h{p}}
+
+
+\usepackage[normalem]{ulem}
+
+\newcommand{\pwr}{\text{Pwr}}
+\newcommand{\pwrt}{\text{Pwr}(\theta)}
+
+
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\usepackage{listings}
+
+\usepackage[normalem]{ulem}
+
+\usepackage{graphicx} 
+\usepackage{fancyvrb} 
+\lstnewenvironment{rcode}{\lstset{frame=tb,% setup listings 
+        language=R,% set programming language 
+        basicstyle=\small\ttfamily,% basic font style 
+        keywordstyle=\bfseries\color{blue},% keyword style 
+        commentstyle=\ttfamily\itshape\color{dkgreen},% comment style 
+          stringstyle=\color{mauve},
+        numbers=left,% display line numbers on the left side 
+        numberstyle=\scriptsize,% use small line numbers 
+        numbersep=10pt,% space between line numbers and code 
+        tabsize=3,% sizes of tabs 
+        showstringspaces=false,% do not replace spaces in strings by a certain character 
+        captionpos=b,% positioning of the caption below 
+        breaklines=true,% automatic line breaking 
+        escapeinside={(*}{*)},% escaping to LaTeX 
+        fancyvrb=true,% verbatim code is typset by listings 
+        extendedchars=false,% prohibit extended chars (chars of codes 128--255) 
+        literate={"}{{\texttt{"}}}1{<-}{{$\leftarrow$}}1{<<-}{{$\twoheadleftarrow$}}1 
+        {~}{{$\sim$}}1{<=}{{$\le$}}1{>=}{{$\ge$}}1{!=}{{$\neq$}}1{^}{{$^\wedge$}}1,% item to replace, text, length of chars 
+        alsoletter={.<-},% becomes a letter 
+        %alsoother={$},% becomes other 
+        %otherkeywords={!=, ~, $, *, \&, \%/\%, \%*\%, \%\%, <-, <<-, /},% other keywords 
+        %deletekeywords={c}% remove keywords }}{}
+        }
+        }{}
+        
+        
+\lstnewenvironment{ccode}{\lstset{frame=tb,% setup listings 
+        language=C,% set programming language 
+        basicstyle=\small\ttfamily,% basic font style 
+        keywordstyle=\bfseries\color{blue},% keyword style 
+        commentstyle=\ttfamily\itshape\color{dkgreen},% comment style 
+          stringstyle=\color{mauve},
+        numbers=left,% display line numbers on the left side 
+        numberstyle=\scriptsize,% use small line numbers 
+        numbersep=10pt,% space between line numbers and code 
+        tabsize=3,% sizes of tabs 
+        showstringspaces=false,% do not replace spaces in strings by a certain character 
+        captionpos=b,% positioning of the caption below 
+        breaklines=true,% automatic line breaking 
+        escapeinside={(*}{*)},% escaping to LaTeX 
+        fancyvrb=true,% verbatim code is typset by listings 
+        extendedchars=false,% prohibit extended chars (chars of codes 128--255) 
+        literate={"}{{\texttt{"}}}1{<-}{{$\leftarrow$}}1{<<-}{{$\twoheadleftarrow$}}1 
+        {~}{{$\sim$}}1{<=}{{$\le$}}1{>=}{{$\ge$}}1{!=}{{$\neq$}}1{^}{{$^\wedge$}}1,% item to replace, text, length of chars 
+        %alsoletter={.<-},% becomes a letter 
+        %alsoother={$},% becomes other 
+        %otherkeywords={!=, ~, $, *, \&, \%/\%, \%*\%, \%\%, <-, <<-, /},% other keywords 
+        %deletekeywords={c}% remove keywords }}{}
+        }}{}
+
+\lstnewenvironment{bash}{\lstset{frame=tb,% setup listings 
+        language=bash,% set programming language 
+        basicstyle=\small\ttfamily,% basic font style 
+        keywordstyle=\bfseries\color{blue},% keyword style 
+        commentstyle=\ttfamily\itshape\color{dkgreen},% comment style 
+          stringstyle=\color{mauve},
+        numbers=left,% display line numbers on the left side 
+        numberstyle=\scriptsize,% use small line numbers 
+        numbersep=10pt,% space between line numbers and code 
+        tabsize=3,% sizes of tabs 
+        showstringspaces=false,% do not replace spaces in strings by a certain character 
+        captionpos=b,% positioning of the caption below 
+        breaklines=true,% automatic line breaking 
+        escapeinside={(*}{*)},% escaping to LaTeX 
+        fancyvrb=true,% verbatim code is typset by listings 
+        extendedchars=false,% prohibit extended chars (chars of codes 128--255) 
+        literate={"}{{\texttt{"}}}1{<-}{{$\leftarrow$}}1{<<-}{{$\twoheadleftarrow$}}1 
+        {~}{{$\sim$}}1{<=}{{$\le$}}1{>=}{{$\ge$}}1{!=}{{$\neq$}}1{^}{{$^\wedge$}}1,% item to replace, text, length of chars 
+        %alsoletter={.<-},% becomes a letter 
+        %alsoother={$},% becomes other 
+        %otherkeywords={!=, ~, $, *, \&, \%/\%, \%*\%, \%\%, <-, <<-, /},% other keywords 
+        %deletekeywords={c}% remove keywords }}{}
+        }}{}
+
+
+\usepackage{amsthm}
+\renewcommand\qedsymbol{$\blacksquare$}
+
+\usepackage{placeins}
+
+\newcommand{\fqo}{{}_5q_0}
+
+\usepackage{tikz}
+\usetikzlibrary{backgrounds,matrix}
+
+\newcommand{\btheta}{\boldsymbol{\theta}}
+
+\newcommand{\bpi}{\boldsymbol{\pi}}
+
+\newcommand{\bbeta}{\boldsymbol{\beta}}
+
+\newcommand{\onen}{\dfrac{1}{n}}
+
+\newcommand{\bc}{\b{C}}
+
+\usepackage{algorithmicx}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\algnewcommand\algorithmicinput{\textbf{Input:}}
+\algnewcommand\Input{\item[\algorithmicinput]}
+\algnewcommand\algorithmicoutput{\textbf{Output:}}
+\algnewcommand\Output{\item[\algorithmicoutput]}

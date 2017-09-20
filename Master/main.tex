@@ -1,0 +1,184 @@
+\documentclass{template}
+\bibliographystyle{plainnat}
+\input{preamble}
+\begin{document}
+
+
+\begin{center}
+  {\Large \textbf{Microbiome Technical Report}}\\
+  {\large Bryan Martin} \\ 
+  {Draft Compiled: \today} 
+\end{center}
+
+\setcounter{section}{-1}
+
+\section{Notation}
+ \begin{table}[ht]
+\centering
+\begin{tabular}{l|c|c}
+\textbf{Notation} & \textbf{Definition} & \textbf{Notes} \\
+  \hline \hline
+$\mbf{W}$ & raw count data & ($n\times Q$)\\
+$\mbf{X}$ & compositional data & ($n\times Q$)\\
+%d & $D-1$\\
+$\mbf{y}$ & $\log(\mbf{x}_{-D}/\mbf{x}_{D})$ & distributed MVN, used for LN model\\
+$\mbf{Y}$ & matrix with rows $\mbf{y}$ & ($n \times Q-1$) \\
+$M_i$ & $\sum_{q=1}^{Q} (\mbf{W}_i)_q$ & ancillary
+\end{tabular}
+\end{table}
+
+\section{Introduction}
+
+Microbiome research, along with many other modern scientific research applications, requires methods to understand, interpret, and analyze compositional data. Standard statistical procedures are not reliable for these analyses due to problems arising from the unit-sum constraint, subcompositional analysis, and parameter interpretation (\cite{aitchison1986statistical}). These challenges motivate the additive logistic normal distribution (LN), created by \cite{aitchison1986statistical} for the purpose of analyzing compositional data.
+
+The LN distribution allows for standard statistical procedures and tests based on multivariate normality, including a test of distributional fit. It can accommodate both dependent and independent structures, and independence can be tested as a hypothesis. Further, if a composition is distributed logistic normal, then so is any subcomposition, any subcomposition conditional on another subcomposition, permutation, or perturbation given some conditions (\cite{aitchison1986statistical}). 
+
+The additive logistic normal multinomial distribution (LNM, \cite{billheimer2001statistical}) combines the LN distribution with a conditional mutinomial model. The LNM distribution models observed counts with a multinomial distribution, where the underlying compositions are considered random variables modeled by the LN distribution. This model can be used as a data-generating distribution for multivariate count data, while still allowing for the flexible covariance structure of the LN distribution. This model is the focus of  \cite{xia2013logistic}.
+
+In \cite{xia2013logistic}, the primary goal is variable selection. Thus, they use a group $\ell_1$ penalty to estimate LNM distribution parameters. However, while the LNM distribution has several appealing qualities, likelihood-based inference is difficult because there is no closed form log-likelihood function. This motivates the use and necessity of Monte Carlo EM (MCEM) algorithm. In this algorithm, the E-step includes a  Metropilis-Hastings (MH) algorithm to sample from unobserved compositions, and the M-step selects variables by maximizing a penalized estimation problem.
+
+In this manuscript, we implement and evaluate the performance of the parameter estimation procedure of \cite{xia2013logistic}. Currently, we simplify by removing penalization and covariates. We apply the MCEM algorithm to Whitman soil field data.
+
+
+\section{Model}
+\subsection{Data Description and Notation}
+Following the notation of Section 0, we use count data on $n=119$ samples that of $Q=7770$ OTUs. $\mbf{W}=(\mbf{W}_1,\ldots,\mbf{W}_{Q})^T\in\R^{n\times Q}$ denotes the random vector of counts. $M_i=\sum_{q=1}^{Q} (\mbf{W}_i)_q$ denotes the total count of OTU $i$. Let $\mbf{X}=(\mbf{X}_1,\ldots,\mbf{X}_{Q})^T\in\R^{n\times Q}$ be the underlying compositions, so that $\sum_{q=1}^Q (\mbf{X}_{i})_q=1$ for all OTUs $i$.
+
+\subsection{The LNM Model}
+We model raw counts $\mbf{W}$ conditional on the composition $\mbf{X}$ using a multinomial distribution
+$$P(\mbf{W}|\mbf{X})\propto \prod_{q=1}^{Q} (\mbf{X}_q)^{\mbf{W}_q}.$$
+
+The composition $\mbf{X}$ is modeled with an LN distribution to allow for a flexible covariance structure. To express this likelihood, we first apply the additive log-ratio transformation ($\phi$) to map $\mbf{x}$ to $\R^{Q-1}$. Thus, for arbitrary base $D$, we define the log-ratio transformed composition,
+$$\mbf{Y}=\phi(\mbf{X})=\set{\log\paren{\dfrac{\mbf{X}_1}{\mbf{X}_D}},\ldots,\log\paren{\dfrac{\mbf{X}_{D-1}}{\mbf{X}_D}},\log\paren{\dfrac{\mbf{X}_{D+1}}{\mbf{X}_D}},\ldots,\log\paren{\dfrac{\mbf{X}_Q}{\mbf{X}_D}}}^T.$$
+We then define the inverse function, $\phi^{-1}$,
+\bal 
+\mbf{X}_q=(\phi^{-1}(\mbf{Y}))_q&= \dfrac{\exp{\mbf{Y}_q}}{\sum_{q\neq D}\exp{\mbf{Y}_q}+1}, \quad q=1,\ldots,D-1,D+1,\ldots Q\\
+\mbf{X}_{D} &= \dfrac{1}{\sum_{q\neq D}\exp{\mbf{Y}_q}+1}.
+\eal 
+$\mbf{Y}$ is then modeled using a multivariate normal distribution $\N_{Q-1}(\boldsymbol{\mu},\boldsymbol{\Sigma})$ with density
+$$f(\mbf{Y}; \boldsymbol{\mu},\boldsymbol{\Sigma}) \propto |\boldsymbol{\Sigma}|^{-1/2} \exp{-\dfrac{1}{2}(\mbf{Y}-\boldsymbol{\mu})^T\boldsymbol{\Sigma}^{-1}(\mbf{Y}-\boldsymbol{\mu})}. $$
+Finally, and importantly, this model is only well-defined when no proportions are equal to $0$. Thus, as in \cite{aitchison1986statistical}, \cite{billheimer2001statistical}, and \cite{xia2013logistic}, we slightly perturb composition $\mbf{X}$ before applying $\phi$.
+
+
+\section{MC-EM Algorithm}
+
+\textbf{TODO}
+
+-- Algorithm: write out what would be the E step of EM, then explain why we can't do EM (using your explanation, not Xia's). Then that motivates MC-EM, which you can then give us a description of.
+
+\subsection{Description}
+
+In this model, the mean vector is modeled as a function of an intercept and  regression coefficients for the covariates. In my current implementation, I have simplified out covariates and penalization. They denote the parameters of interest as $$\boldsymbol{\eta}\equiv (\boldsymbol{\beta}_0,\boldsymbol{\beta},\boldsymbol{\Sigma}).$$
+
+In general, the EM algorithm iterates between two steps. The E-step computes the \textit{expected complete data log-likelihood}. This is the correct log-likelihood if we take the current parameter estimates as given. The M-step \textit{updates parameter estimates} given the log-likelihood from the E-step. The estimates are then used for the E-step of the following iteration.
+
+\noindent\textbf{E-Step}
+
+The MC-EM algorithm complicates the standard EM algorithm by including MCMC in the E-step. This is necessary in some cases where the conditional distribution is difficult, so the closed form solution for the E-step cannot be obtained.
+
+We aim to compute the expected complete data log-likelihood \bal 
+E[\ell(\boldsymbol{\eta})]&\equiv Q(\boldsymbol{\eta}|\boldsymbol{\eta}^{(t-1)})\\
+&= -\dfrac{1}{2}n\log(|\boldsymbol{\Sigma}|)-\dfrac{1}{2}\sumi E\brack{(\mbf{Y}_i-\boldsymbol{\beta}_0)^T\boldsymbol{\Sigma}^{-1}(\mbf{Y}_i-\boldsymbol{\beta}_0)}
+\eal 
+where the expectation is taken with respect to the conditional distribution of $\mbf{Y}_i|(\mbf{W}_i; \boldsymbol{\eta}^{(t-1)})$. This conditional distribution is  given by: 
+\begin{equation}
+    \pi(\mbf{Y}_i|\mbf{W}_i,\mbf{X}_i) \propto \dfrac{\prod_{k=1}^K \exp{W_{ik}Y_{ik}}}{\brack{\sum_{k=1}^K \exp{Y_{ik}}+1}^{M_i}} \paren{\exp{-\dfrac{1}{2}\brack{\mbf{Y}_i^{(t-1)*T}(\boldsymbol{\Sigma}^{(t-1)})^{-1}\mbf{Y}_i^{(t-1)*}}}},
+\end{equation}
+where $\mbf{Y}_i^{(t-1)*}\equiv \mbf{Y}_i- \boldsymbol{\beta}_0^{(t-1)}$.
+
+We compute the conditional expectations using the standard Metropolis-Hastings (MH) algorithm, in which we propose a new vector $\mbf{Y}_i\sim \N(\mbf{Y}_i^{(r-1)},v\mbf{I})$.
+
+After burn-ins, we use $R$ MH sample to calculate the conditional expectations.
+
+\noindent\textbf{M-step}
+
+Without covariates, updating to  $\boldsymbol{\eta}^{(t)}$ has closed form
+\bal 
+\boldsymbol{\Sigma}^{(t)} &=\dfrac{1}{R}\sum_{r=1}^{R}\paren{\dfrac{\sumi \paren{\mbf{Y}_i^{(r*)}}\paren{\mbf{Y}_i^{(r*)}}^T}{n}},\\
+\boldsymbol{\beta}_{0k}^{(t)} &= \onen\sumi \paren{\dfrac{1}{R}\sum_{r=1}^{R}Y_{ik}^{(r)}},
+\eal 
+where $\mbf{Y}^{(r)*}=\mbf{Y}_i^{(r)}-\boldsymbol{\beta}_0^{(t-1)}$.
+
+
+\subsection{Pseudocode}
+
+ I express the algorithm using 3 separate functions.
+
+
+\FloatBarrier 
+\begin{algorithm}[ht!]
+\begin{algorithmic}[1]
+\Input $\mbf{Y}_i\in\R^{Q-1}$, $\mbf{W}_i$, $E[\mbf{Y}_i]$, $D$, $\boldsymbol{\Sigma}^{-1}$, iter, $v$
+\Output $\mbf{Y}^{MH}\in\R^{\text{iter}\times Q-1}$ (a MH sample matrix of $\mbf{Y}_i$)
+\For{$j=1,\ldots,$ iter}
+\State $\boldsymbol{\eps} \sim \N(0,v)$
+\State Propose $\mbf{Y}_i^* \gets \mbf{Y}_i+\boldsymbol{\eps}$
+\State $a \gets \min\paren{1,\dfrac{\pi(\mbf{Y}_i^*)}{\pi(\mbf{Y}_i)}}$
+\State $u \sim \text{Uniform}(0,1)$
+\If{$u<a$}
+\State $\mbf{Y}^{MH}_{j,\cdot} \gets \mbf{Y}_i^*$
+\Else 
+\State $\mbf{Y}^{MH}_{j,\cdot} \gets \mbf{Y}_i$
+\EndIf
+\EndFor
+\Return{$\mbf{Y}^{MH}$}
+\end{algorithmic}
+\caption{\texttt{MCrow}, Markov Resampling for a Single Row}
+\end{algorithm}
+
+
+\begin{algorithm}[ht!]
+\begin{algorithmic}[1]
+\Input $\mbf{Y}\in\R^{N\times Q-1}$, $\mbf{W}$, $E[\mbf{Y}]$, $D$, $\boldsymbol{\Sigma}^{-1}$, iter, $v$
+\Output $\mbf{Y}^{MH}\in\R^{\text{iter}\times Q-1\times N}$ (a MH sample array of $\mbf{Y}$)
+\For{$i=1,\ldots,$ iter}
+\State $\mbf{Y}^{MH}_{\cdot,\cdot,i} \gets$ \texttt{MCrow}($\cdots$)
+\EndFor
+\Return{$\mbf{Y}^{MH}$}
+\end{algorithmic}
+\caption{\texttt{MCmat}, Markov Resampling for an Entire Matrix}
+\end{algorithm}
+
+
+\begin{algorithm}[ht!]
+\begin{algorithmic}[1]
+\Input  $\mbf{W}\in\R^{N\times Q}$, $D$,  iterEM, iterMC, burnEM, burnMC, $v$
+\Output $\hat{\boldsymbol{\beta}}$, $\hat{\boldsymbol{\Sigma}}$
+\State $\mbf{Y}\gets \texttt{logRatios}(\mbf{W},$ base $=D)$
+\State $\boldsymbol{\beta}^{(0)} \gets \texttt{colMeans}(\mbf{Y})$
+\State $E[\mbf{Y}]^{(0)} \gets \mbf{1}(\boldsymbol{\beta}^{(0)})^T$
+\State $\boldsymbol{\Sigma}^{(0)} \gets \texttt{cov}(\mbf{Y}-E[\mbf{Y}^{(0)}])$
+\For{em $=1:$iterEM}
+\State $\mbf{A}\gets \texttt{MCmat}(\cdots)$
+\State Burn the first burnMC iterations of $\mbf{A}$
+\State $\mbf{Y}^*\gets$ means of $\mbf{A}$ across the remaining MC iterations
+\State $\boldsymbol{\beta}^{(\text{em})} \gets \texttt{colMeans}(\mbf{Y}^*)$
+\State $\mbf{S}\gets 0$
+\For{$i=1:(\text{iterMC}-\text{burnMC})$}
+\State $\mbf{e}\gets \mbf{A}_{i,\cdot,\cdot}^T-E[\mbf{Y}]^{(\text{em}-1)}$
+\State $\mbf{S}\gets \mbf{S}+\mbf{e}^T\mbf{e}$
+\EndFor
+\State $\boldsymbol{\Sigma}^{(\text{em})}\gets \mbf{S}/(N\times (\text{iterMC}-\text{burnMC}))$
+\State $E[\mbf{Y}]^{(\text{em})} \gets \mbf{1}(\boldsymbol{\beta}^{(\text{em})})^T$
+\EndFor
+\State Burn the first burnEM iterations of $\boldsymbol{\beta}$, $\boldsymbol{\Sigma}$
+\State $\hat{\boldsymbol{\beta}}\gets$ mean of the remaining values in $\boldsymbol{\beta}$
+\State $\hat{\boldsymbol{\Sigma}}\gets$ mean of the remaining values in $\boldsymbol{\Sigma}$
+\end{algorithmic}
+\caption{\texttt{MCEM}, Markov Chain EM Algorithm}
+\end{algorithm}
+
+
+\FloatBarrier
+\bibliography{bib}
+
+\end{document}
+
+
+
+
+
+
+
+
+
