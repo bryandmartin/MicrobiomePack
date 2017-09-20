@@ -9,6 +9,7 @@ MCrow <- function(Yi,Wi,eYi,Q,base,sigInv,MCiter,stepsize=1) {
   # extra column for acceptance indicator
   Yi.MH <- matrix(0,MCiter,Q)
   for(i in 1:MCiter) {
+    #cat(i,"\n")
     # proposal
     Yi.star <- Yi + rnorm(Q-1,0,stepsize)
     # denominator
@@ -43,16 +44,21 @@ acomb3 <- function(...) abind(...,along=3)
 #### Get array
 #### Dim 1 and 2 match MCrow
 #### Dim 3 goes across rows of data (samples)
-MCmat <- function(Y,W,eY,N,Q,base,sigma,MCiter,stepsize=1) {
+MCmat <- function(Y,W,eY,N,Q,base,sigma,MCiter,stepsize=1,poorman=FALSE) {
   #sigInv <- solve(sigma)
-  sigInv <- chol2inv(chol(sigma))
-  
+  if(poorman==TRUE) {
+    # take diagonal vec, make it a diagonal matrix, solve
+    sigInv <- diag(1/diag(sigma))
+  } else {
+    sigInv <- chol2inv(chol(sigma))
+  }
   MH_path <- function(i) {
     MCrow(Yi=Y[i,],Wi=W[i,],eYi=eY[i,],Q=Q,base=base,sigInv=sigInv,MCiter=MCiter,stepsize=stepsize)
   }
   # To remove parallel: comment out registerDoP, chagne %dopar% to %do%, comment out stopI
   registerDoParallel(detectCores())
   Y.MH <-
+    #foreach(i=1:N,.combine='acomb3',.multicombine=TRUE) %do% {
     foreach(i=1:N,.combine='acomb3',.multicombine=TRUE) %dopar% {
       MH_path(i)
     }
@@ -72,7 +78,7 @@ MCmat <- function(Y,W,eY,N,Q,base,sigma,MCiter,stepsize=1) {
 
 ######## FUNCTION ########
 #### Do EM
-LNM.EM <- function(W,base,EMiter=10,EMburn=5,MCiter=1000,MCburn,stepsize=0.01,p=0.05) {
+LNM.EM <- function(W,base,EMiter=10,EMburn=5,MCiter=1000,MCburn,stepsize=0.01,p=0.05,poorman=FALSE) {
   # Base is value of D, stepsize is for MH, p is purturb
   # Just take in W, calculate Y, eY, sigma
   # Don't need X yet, those are covariates
@@ -107,7 +113,7 @@ LNM.EM <- function(W,base,EMiter=10,EMburn=5,MCiter=1000,MCburn,stepsize=0.01,p=
   for(em in 1:EMiter) {
     cat("EM iteration:",em,"\n")
     start <- proc.time()
-    MCarray <- MCmat(Y=Y.p,W=W,eY=eY,N=N,Q=Q,base=base,sigma=sigma,MCiter=MCiter,stepsize=stepsize)
+    MCarray <- MCmat(Y=Y.p,W=W,eY=eY,N=N,Q=Q,base=base,sigma=sigma,MCiter=MCiter,stepsize=stepsize,poorman=poorman)
     
     # should call 119 apply functions, each time, get 75 means. each of iteration values for OTU.
     # ORIGINAL
@@ -159,7 +165,7 @@ LNM.EM <- function(W,base,EMiter=10,EMburn=5,MCiter=1000,MCburn,stepsize=0.01,p=
   b0.EM <- colMeans(b0.list[(EMburn+1):(EMiter+1),])
   sigma.EM <- apply(sigma.list[,,(EMburn+1):(EMiter+1)],c(1,2),mean)
   return(list(mu=b0.EM,sigma=sigma.EM,acceptance=accept.EM,
-              mu.list=b0.list, sigma.list=sigma.list, acceptance.list=accept.list))
+              mu.list=b0.list, sigma.list=sigma.list, acceptance.list=accept.list,Y=Y.p,base=base))
 }
 
 
