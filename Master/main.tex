@@ -62,23 +62,19 @@ Finally, and importantly, this model is only well-defined when no proportions ar
 
 \section{MC-EM Algorithm}
 
-\textbf{TODO}
 
--- Algorithm: write out what would be the E step of EM, then explain why we can't do EM (using your explanation, not Xia's). Then that motivates MC-EM, which you can then give us a description of.
-
-\subsection{Description}
-
-In this model, the mean vector is modeled as a function of an intercept and  regression coefficients for the covariates. In my current implementation, I have simplified out covariates and penalization. They denote the parameters of interest as $$\boldsymbol{\eta}\equiv (\boldsymbol{\beta}_0,\boldsymbol{\beta},\boldsymbol{\Sigma}).$$
 
 In general, the EM algorithm iterates between two steps. The E-step computes the \textit{expected complete data log-likelihood}. This is the correct log-likelihood if we take the current parameter estimates as given. The M-step \textit{updates parameter estimates} given the log-likelihood from the E-step. The estimates are then used for the E-step of the following iteration.
 
+We denote the parameters of interest as $$\boldsymbol{\eta}\equiv (\boldsymbol{\beta}_0,\boldsymbol{\beta},\boldsymbol{\Sigma}).$$
+
 \noindent\textbf{E-Step}
 
-The MC-EM algorithm complicates the standard EM algorithm by including MCMC in the E-step. This is necessary in some cases where the conditional distribution is difficult, so the closed form solution for the E-step cannot be obtained.
+The MC-EM algorithm complicates the standard EM algorithm by including MH in the E-step. This is necessary in this case because the conditional distribution is difficult to integrate, thus we cannot get the conditional expectation in closed form.
 
 We aim to compute the expected complete data log-likelihood \bal 
-E[\ell(\boldsymbol{\eta})]&\equiv Q(\boldsymbol{\eta}|\boldsymbol{\eta}^{(t-1)})\\
-&= -\dfrac{1}{2}n\log(|\boldsymbol{\Sigma}|)-\dfrac{1}{2}\sumi E\brack{(\mbf{Y}_i-\boldsymbol{\beta}_0)^T\boldsymbol{\Sigma}^{-1}(\mbf{Y}_i-\boldsymbol{\beta}_0)}
+E[\ell(\boldsymbol{\eta})]&\equiv Q(\boldsymbol{\eta}|\boldsymbol{\eta}^{(t-1)}),\\
+&= -\dfrac{1}{2}n\log(|\boldsymbol{\Sigma}|)-\dfrac{1}{2}\sumi E\brack{(\mbf{Y}_i-\boldsymbol{\beta}_0)^T\boldsymbol{\Sigma}^{-1}(\mbf{Y}_i-\boldsymbol{\beta}_0)},
 \eal 
 where the expectation is taken with respect to the conditional distribution of $\mbf{Y}_i|(\mbf{W}_i; \boldsymbol{\eta}^{(t-1)})$. This conditional distribution is  given by: 
 \begin{equation}
@@ -86,7 +82,7 @@ where the expectation is taken with respect to the conditional distribution of $
 \end{equation}
 where $\mbf{Y}_i^{(t-1)*}\equiv \mbf{Y}_i- \boldsymbol{\beta}_0^{(t-1)}$.
 
-We compute the conditional expectations using the standard Metropolis-Hastings (MH) algorithm, in which we propose a new vector $\mbf{Y}_i\sim \N(\mbf{Y}_i^{(r-1)},v\mbf{I})$.
+We compute the conditional expectations using the standard Metropolis-Hastings (MH) algorithm, for which we simulate proposals $\mbf{Y}_i\sim \N(\mbf{Y}_i^{(r-1)},v\mbf{I})$.
 
 After burn-ins, we use $R$ MH sample to calculate the conditional expectations.
 
@@ -169,7 +165,27 @@ where $\mbf{Y}^{(r)*}=\mbf{Y}_i^{(r)}-\boldsymbol{\beta}_0^{(t-1)}$.
 \end{algorithm}
 
 
+
 \FloatBarrier
+
+\newpage
+
+\section{Preliminary Results}
+
+The first figure is a replication of the figure from \cite{xia2013logistic}, except that now the results are portrayed on the compositional scale. Two models were fit, for \texttt{DayAmdmt} 11 and 21, respectively. The results are colored by model. Overall, it is difficult to compare models on this scale, though OTUs for which observed and fitted proportions were relatively high do suggest a meaningful difference between the groups.
+
+\grapher{CombinedFittingGraph.pdf}{5in}
+
+The second figure is an attempt to better quantify the differences observed across models in the first figure. This figure takes the expected, or fitted, compositional value from the \texttt{DayAmdmt} 11  model, and subtracts the corresponding value of the \texttt{DayAmdmt} 21. It shows more clearly that there are three OTU indices for which the expected difference  is quite substantial.
+
+\grapher{ExpectedCompDiff.pdf}{5in}
+
+The third figure displays the $\boldsymbol{\mu}$ with two sets of error bars for each model. The black error bars are the diagonal elements of $\boldsymbol{\Sigma}$. The red error bars are the observed standard deviation of the estimates of $\boldsymbol{\mu}$ across the EM iterations.
+
+\grapher{errorBars.pdf}{5in}
+
+
+
 \bibliography{bib}
 
 \end{document}
