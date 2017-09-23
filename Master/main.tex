@@ -42,7 +42,7 @@ In this manuscript, we implement and evaluate the performance of the parameter e
 
 \section{Model}
 \subsection{Data Description and Notation}
-Following the notation of Section 0, we use count data on $n=119$ samples that of $Q+1=7770$ OTUs. $\mbf{W}=(\mbf{W}_1,\ldots,\mbf{W}_{Q+1})^T\in\R^{n\times Q+1}$ denotes the random vector of counts. $M_i=\sum_{q=1}^{Q+1} (\mbf{W}_i)_q$ denotes the total count of OTU $i$. Let $\mbf{X}=(\mbf{X}_1,\ldots,\mbf{X}_{Q})^T\in\R^{n\times Q+1}$ be the underlying compositions, so that $\sum_{q=1}^{Q+1} (\mbf{X}_{i})_q=1$ for all OTUs $i$.
+Following the notation of Section 0, we use count data on $n=119$ samples that of $Q+1=7770$ OTUs. $\mbf{W}=(\mbf{W}_1,\ldots,\mbf{W}_{Q+1})^T\in\R^{n\times Q+1}$ denotes the random vector of counts. $M_i=\sum_{q=1}^{Q+1} (\mbf{W}_i)_q$ denotes the total count of OTU $i$. $\mbf{X}=(\mbf{X}_1,\ldots,\mbf{X}_{Q})^T\in\R^{n\times Q+1}$ denotes the underlying compositions, so that $\sum_{q=1}^{Q+1} (\mbf{X}_{i})_q=1$ for all OTUs $i$.
 
 \subsection{The LNM Model}
 We model raw counts $\mbf{W}$ conditional on the composition $\mbf{X}$ using a multinomial distribution
@@ -58,8 +58,29 @@ We then define the inverse function, $\phi^{-1}$,
 \mbf{X}_{Q+1} &= \dfrac{1}{\sum_{q=1}^{Q}\exp{\mbf{Y}_q}+1}.
 \eal 
 $\mbf{Y}$ is then modeled using a multivariate normal distribution $\N_{Q}(\boldsymbol{\mu},\boldsymbol{\Sigma})$ with density
-$$f(\mbf{Y}; \boldsymbol{\mu},\boldsymbol{\Sigma}) \propto |\boldsymbol{\Sigma}|^{-1/2} \exp{-\dfrac{1}{2}(\mbf{Y}-\boldsymbol{\mu})^T\boldsymbol{\Sigma}^{-1}(\mbf{Y}-\boldsymbol{\mu})}. $$
+\begin{equation}\label{eq:fyeta}
+f(\mbf{Y}; \boldsymbol{\mu},\boldsymbol{\Sigma}) \propto |\boldsymbol{\Sigma}|^{-1/2} \exp{-\dfrac{1}{2}(\mbf{Y}-\boldsymbol{\mu})^T\boldsymbol{\Sigma}^{-1}(\mbf{Y}-\boldsymbol{\mu})}. \end{equation}
 Finally, and importantly, this model is only well-defined when no proportions are equal to $0$. Thus, as in \cite{aitchison1986statistical}, \cite{billheimer2001statistical}, and \cite{xia2013logistic}, we slightly perturb composition $\mbf{X}$ before applying $\phi$.
+
+
+\subsection{Conditional Distribution of Latent Variables}
+
+The aim of using this distribution is the ability to solve for parameters $\boldsymbol{\mu}$ and $\boldsymbol{\Sigma}$ in order to inform us about our  compositions $\mbf{X}$ or $\mbf{Y}$. In doing so, we use our observed data $\mbf{W}$ to inform us about the distribution of latent $\mbf{Y}$. We denote the parameters of interest as $\boldsymbol{\eta}\equiv (\boldsymbol{\mu},\boldsymbol{\Sigma})$. Using the LNM model, we can write the conditional distribution
+\bal  \pi(\mbf{Y}_i|\mbf{W}_i;\boldsymbol{\eta}^{(t-1)}) &\propto P(\mbf{W}_i|\mbf{Y}_i) \times f(\mbf{Y}_i|\boldsymbol{\eta}^{(t-1)})\eal 
+The latter distribution is given by Equation~\eqref{eq:fyeta}. For the former, note that by the definition of $\phi^{-1}()$, we can fully recover $\mbf{X}_i$ given $\mbf{Y}_i$. Thus: 
+\bal 
+P(\mbf{W}_i|\mbf{Y}_i) &= P(\mbf{W}_i|\mbf{X}_i), \\ 
+&= \prod_{q=1}^{Q+1} (X_{iq})^{W_{iq}},\\
+&= X_{i,Q+1}^{W_{i,Q+1}}\prod_{q=1}^{Q} (\phi^{-1}(\mbf{Y}_i))_q^{W_{iq}},\\
+&\propto \paren{\dfrac{ \exp{Y_{i1}}}{\brack{\sum_{q=1}^Q \exp{Y_{i1}}+1}}}^{W_{i1}} \times \cdots \times \paren{\dfrac{ \exp{Y_{iQ}}}{\brack{\sum_{q=1}^Q \exp{Y_{iQ}}+1}}}^{W_{iQ}}.
+\eal
+Thus, we arrive at 
+\begin{equation}\label{eq:fullcond}
+    \pi(\mbf{Y}_i|\mbf{W}_i;\boldsymbol{\eta}^{(t-1)}) \propto \dfrac{\prod_{q=1}^Q \exp{W_{iq}Y_{iq}}}{\brack{\sum_{q=1}^Q \exp{Y_{iq}}+1}^{M_i}} \paren{\exp{-\dfrac{1}{2}\brack{\mbf{Y}_i^{(t-1)*T}(\boldsymbol{\Sigma}^{(t-1)})^{-1}\mbf{Y}_i^{(t-1)*}}}},
+\end{equation}
+where $\mbf{Y}_i^{(t-1)*}\equiv \mbf{Y}_i- \boldsymbol{\mu}^{(t-1)}$.
+
+
 
 
 \section{MC-EM Algorithm}
@@ -68,7 +89,7 @@ Finally, and importantly, this model is only well-defined when no proportions ar
 
 In general, the EM algorithm iterates between two steps. The E-step computes the \textit{expected complete data log-likelihood}. This is the correct log-likelihood if we take the current parameter estimates as given. The M-step \textit{updates parameter estimates} given the log-likelihood from the E-step. The estimates are then used for the E-step of the following iteration.
 
-We denote the parameters of interest as $$\boldsymbol{\eta}\equiv (\boldsymbol{\beta}_0,\boldsymbol{\beta},\boldsymbol{\Sigma}).$$
+
 
 \noindent\textbf{E-Step}
 
@@ -76,26 +97,23 @@ The MC-EM algorithm complicates the standard EM algorithm by including MH in the
 
 We aim to compute the expected complete data log-likelihood \bal 
 E[\ell(\boldsymbol{\eta})]&\equiv Q(\boldsymbol{\eta}|\boldsymbol{\eta}^{(t-1)}),\\
-&= -\dfrac{1}{2}n\log(|\boldsymbol{\Sigma}|)-\dfrac{1}{2}\sumi E\brack{(\mbf{Y}_i-\boldsymbol{\beta}_0)^T\boldsymbol{\Sigma}^{-1}(\mbf{Y}_i-\boldsymbol{\beta}_0)},
+&= -\dfrac{1}{2}n\log(|\boldsymbol{\Sigma}|)-\dfrac{1}{2}\sumi E\brack{(\mbf{Y}_i-\boldsymbol{\mu})^T\boldsymbol{\Sigma}^{-1}(\mbf{Y}_i-\boldsymbol{\mu})},
 \eal 
-where the expectation is taken with respect to the conditional distribution of $\mbf{Y}_i|(\mbf{W}_i; \boldsymbol{\eta}^{(t-1)})$. This conditional distribution is  given by: 
-\begin{equation}
-    \pi(\mbf{Y}_i|\mbf{W}_i) \propto \dfrac{\prod_{q=1}^Q \exp{W_{iq}Y_{iq}}}{\brack{\sum_{q=1}^Q \exp{Y_{iq}}+1}^{M_i}} \paren{\exp{-\dfrac{1}{2}\brack{\mbf{Y}_i^{(t-1)*T}(\boldsymbol{\Sigma}^{(t-1)})^{-1}\mbf{Y}_i^{(t-1)*}}}},
-\end{equation}
-where $\mbf{Y}_i^{(t-1)*}\equiv \mbf{Y}_i- \boldsymbol{\beta}_0^{(t-1)}$.
-
-We compute the conditional expectations using the standard Metropolis-Hastings (MH) algorithm, for which we simulate proposals $\mbf{Y}_i\sim \N(\mbf{Y}_i^{(r-1)},v\mbf{I})$.
-
-After burn-ins, we use $R$ MH sample to calculate the conditional expectations.
+where the expectation is taken with respect to the conditional distribution of $\mbf{Y}_i|(\mbf{W}_i; \boldsymbol{\eta}^{(t-1)})$. This conditional distribution is  given by Equation~\eqref{eq:fullcond}. We may rewrite the conditional expectation as
+\bal 
+E_{\pi(\mbf{Y}_i|(\mbf{W}_i; \boldsymbol{\eta}^{(t-1)}))}&\brack{(\mbf{Y}_i-\boldsymbol{\mu})^T\boldsymbol{\Sigma}^{-1}(\mbf{Y}_i-\boldsymbol{\mu})} = \\
+&\int_{\Omega(\mbf{Y}_i)} (\mbf{Y}_i-\boldsymbol{\mu})^T\boldsymbol{\Sigma}^{-1}(\mbf{Y}_i-\boldsymbol{\mu})\pi(\mbf{Y}_i|(\mbf{W}_i; \boldsymbol{\eta}^{(t-1)})) d\mbf{Y}_i.
+\eal 
+Substituting in $\pi(\mbf{Y}_i|(\mbf{W}_i; \boldsymbol{\eta}^{(t-1)})) d\mbf{Y}_i$ from Equation~\eqref{eq:fullcond}, we can see the difficulty of solving this integral analytically. Thus, in order to estimate it numerically, we can use the Metropolis-Hastings algorithm. We simulate proposals $\mbf{Y}_i\sim \N(\mbf{Y}_i^{(r-1)},v\mbf{I})$, and after burn-ins, we use these $R$ samples to approximate our expectation.
 
 \noindent\textbf{M-step}
 
 Without covariates, updating to  $\boldsymbol{\eta}^{(t)}$ has closed form
 \bal 
 \boldsymbol{\Sigma}^{(t)} &=\dfrac{1}{R}\sum_{r=1}^{R}\paren{\dfrac{\sumi \paren{\mbf{Y}_i^{(r)*}}\paren{\mbf{Y}_i^{(r)*}}^T}{n}},\\
-\boldsymbol{\beta}_{0q}^{(t)} &= \onen\sumi \paren{\dfrac{1}{R}\sum_{r=1}^{R}Y_{iq}^{(r)}},
+\boldsymbol{\mu}_{q}^{(t)} &= \onen\sumi \paren{\dfrac{1}{R}\sum_{r=1}^{R}Y_{iq}^{(r)}},
 \eal 
-where $\mbf{Y}^{(r)*}=\mbf{Y}_i^{(r)}-\boldsymbol{\beta}_0^{(t-1)}$.
+where $\mbf{Y}^{(r)*}=\mbf{Y}_i^{(r)}-\boldsymbol{\mu}^{(t-1)}$.
 
 
 \subsection{Pseudocode}
