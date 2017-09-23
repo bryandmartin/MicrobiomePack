@@ -18,12 +18,12 @@
 \begin{tabular}{l|c|c}
 \textbf{Notation} & \textbf{Definition} & \textbf{Notes} \\
   \hline \hline
-$\mbf{W}$ & raw count data & ($n\times Q$)\\
-$\mbf{X}$ & compositional data & ($n\times Q$)\\
+$\mbf{W}$ & raw count data & ($n\times Q+1$), observed\\
+$\mbf{X}$ & compositional data & ($n\times Q+1$), latent\\
 %d & $D-1$\\
 $\mbf{y}$ & $\log(\mbf{x}_{-D}/\mbf{x}_{D})$ & distributed MVN, used for LN model\\
-$\mbf{Y}$ & matrix with rows $\mbf{y}$ & ($n \times Q-1$) \\
-$M_i$ & $\sum_{q=1}^{Q} (\mbf{W}_i)_q$ & ancillary
+$\mbf{Y}$ & matrix with rows $\mbf{y}$ & ($n \times Q$), latent \\
+$M_i$ & $\sum_{q=1}^{Q+1} (\mbf{W}_i)_q$ & ancillary
 \end{tabular}
 \end{table}
 
@@ -42,20 +42,22 @@ In this manuscript, we implement and evaluate the performance of the parameter e
 
 \section{Model}
 \subsection{Data Description and Notation}
-Following the notation of Section 0, we use count data on $n=119$ samples that of $Q=7770$ OTUs. $\mbf{W}=(\mbf{W}_1,\ldots,\mbf{W}_{Q})^T\in\R^{n\times Q}$ denotes the random vector of counts. $M_i=\sum_{q=1}^{Q} (\mbf{W}_i)_q$ denotes the total count of OTU $i$. Let $\mbf{X}=(\mbf{X}_1,\ldots,\mbf{X}_{Q})^T\in\R^{n\times Q}$ be the underlying compositions, so that $\sum_{q=1}^Q (\mbf{X}_{i})_q=1$ for all OTUs $i$.
+Following the notation of Section 0, we use count data on $n=119$ samples that of $Q+1=7770$ OTUs. $\mbf{W}=(\mbf{W}_1,\ldots,\mbf{W}_{Q+1})^T\in\R^{n\times Q+1}$ denotes the random vector of counts. $M_i=\sum_{q=1}^{Q+1} (\mbf{W}_i)_q$ denotes the total count of OTU $i$. Let $\mbf{X}=(\mbf{X}_1,\ldots,\mbf{X}_{Q})^T\in\R^{n\times Q+1}$ be the underlying compositions, so that $\sum_{q=1}^{Q+1} (\mbf{X}_{i})_q=1$ for all OTUs $i$.
 
 \subsection{The LNM Model}
 We model raw counts $\mbf{W}$ conditional on the composition $\mbf{X}$ using a multinomial distribution
-$$P(\mbf{W}|\mbf{X})\propto \prod_{q=1}^{Q} (\mbf{X}_q)^{\mbf{W}_q}.$$
+$$P(\mbf{W}|\mbf{X})\propto \prod_{q=1}^{Q+1} (\mbf{X}_q)^{\mbf{W}_q}.$$
 
-The composition $\mbf{X}$ is modeled with an LN distribution to allow for a flexible covariance structure. To express this likelihood, we first apply the additive log-ratio transformation ($\phi$) to map $\mbf{x}$ to $\R^{Q-1}$. Thus, for arbitrary base $D$, we define the log-ratio transformed composition,
-$$\mbf{Y}=\phi(\mbf{X})=\set{\log\paren{\dfrac{\mbf{X}_1}{\mbf{X}_D}},\ldots,\log\paren{\dfrac{\mbf{X}_{D-1}}{\mbf{X}_D}},\log\paren{\dfrac{\mbf{X}_{D+1}}{\mbf{X}_D}},\ldots,\log\paren{\dfrac{\mbf{X}_Q}{\mbf{X}_D}}}^T.$$
+The composition $\mbf{X}$ is modeled with an LN distribution to allow for a flexible covariance structure. To express this likelihood, we first apply the additive log-ratio transformation ($\phi$) to map $\mbf{x}$ to $\R^{Q}$. Thus, for arbitrary base $D$, we define the log-ratio transformed composition,
+$$\mbf{Y}=\phi(\mbf{X})=\set{\log\paren{\dfrac{\mbf{X}_1}{\mbf{X}_D}},\ldots,\log\paren{\dfrac{\mbf{X}_{D-1}}{\mbf{X}_D}},\log\paren{\dfrac{\mbf{X}_{D+1}}{\mbf{X}_D}},\ldots,\log\paren{\dfrac{\mbf{X}_{Q+1}}{\mbf{X}_D}}}^T.$$
+WLOG (\cite{aitchison1986statistical}), we can assume that $D=Q+1$. Thus,
+$$\mbf{Y}=\phi(\mbf{X})=\set{\log\paren{\dfrac{\mbf{X}_1}{\mbf{X}_{Q+1}}},\ldots,\log\paren{\dfrac{\mbf{X}_{Q}}{\mbf{X}_{Q+1}}}}^T.$$
 We then define the inverse function, $\phi^{-1}$,
 \bal 
-\mbf{X}_q=(\phi^{-1}(\mbf{Y}))_q&= \dfrac{\exp{\mbf{Y}_q}}{\sum_{q\neq D}\exp{\mbf{Y}_q}+1}, \quad q=1,\ldots,D-1,D+1,\ldots Q\\
-\mbf{X}_{D} &= \dfrac{1}{\sum_{q\neq D}\exp{\mbf{Y}_q}+1}.
+\mbf{X}_q=(\phi^{-1}(\mbf{Y}))_q&= \dfrac{\exp{\mbf{Y}_q}}{\sum_{q=1}^{Q}\exp{\mbf{Y}_q}+1}, \quad q=1,\ldots Q\\
+\mbf{X}_{Q+1} &= \dfrac{1}{\sum_{q=1}^{Q}\exp{\mbf{Y}_q}+1}.
 \eal 
-$\mbf{Y}$ is then modeled using a multivariate normal distribution $\N_{Q-1}(\boldsymbol{\mu},\boldsymbol{\Sigma})$ with density
+$\mbf{Y}$ is then modeled using a multivariate normal distribution $\N_{Q}(\boldsymbol{\mu},\boldsymbol{\Sigma})$ with density
 $$f(\mbf{Y}; \boldsymbol{\mu},\boldsymbol{\Sigma}) \propto |\boldsymbol{\Sigma}|^{-1/2} \exp{-\dfrac{1}{2}(\mbf{Y}-\boldsymbol{\mu})^T\boldsymbol{\Sigma}^{-1}(\mbf{Y}-\boldsymbol{\mu})}. $$
 Finally, and importantly, this model is only well-defined when no proportions are equal to $0$. Thus, as in \cite{aitchison1986statistical}, \cite{billheimer2001statistical}, and \cite{xia2013logistic}, we slightly perturb composition $\mbf{X}$ before applying $\phi$.
 
@@ -78,7 +80,7 @@ E[\ell(\boldsymbol{\eta})]&\equiv Q(\boldsymbol{\eta}|\boldsymbol{\eta}^{(t-1)})
 \eal 
 where the expectation is taken with respect to the conditional distribution of $\mbf{Y}_i|(\mbf{W}_i; \boldsymbol{\eta}^{(t-1)})$. This conditional distribution is  given by: 
 \begin{equation}
-    \pi(\mbf{Y}_i|\mbf{W}_i,\mbf{X}_i) \propto \dfrac{\prod_{k=1}^K \exp{W_{ik}Y_{ik}}}{\brack{\sum_{k=1}^K \exp{Y_{ik}}+1}^{M_i}} \paren{\exp{-\dfrac{1}{2}\brack{\mbf{Y}_i^{(t-1)*T}(\boldsymbol{\Sigma}^{(t-1)})^{-1}\mbf{Y}_i^{(t-1)*}}}},
+    \pi(\mbf{Y}_i|\mbf{W}_i) \propto \dfrac{\prod_{q=1}^Q \exp{W_{iq}Y_{iq}}}{\brack{\sum_{q=1}^Q \exp{Y_{iq}}+1}^{M_i}} \paren{\exp{-\dfrac{1}{2}\brack{\mbf{Y}_i^{(t-1)*T}(\boldsymbol{\Sigma}^{(t-1)})^{-1}\mbf{Y}_i^{(t-1)*}}}},
 \end{equation}
 where $\mbf{Y}_i^{(t-1)*}\equiv \mbf{Y}_i- \boldsymbol{\beta}_0^{(t-1)}$.
 
@@ -90,8 +92,8 @@ After burn-ins, we use $R$ MH sample to calculate the conditional expectations.
 
 Without covariates, updating to  $\boldsymbol{\eta}^{(t)}$ has closed form
 \bal 
-\boldsymbol{\Sigma}^{(t)} &=\dfrac{1}{R}\sum_{r=1}^{R}\paren{\dfrac{\sumi \paren{\mbf{Y}_i^{(r*)}}\paren{\mbf{Y}_i^{(r*)}}^T}{n}},\\
-\boldsymbol{\beta}_{0k}^{(t)} &= \onen\sumi \paren{\dfrac{1}{R}\sum_{r=1}^{R}Y_{ik}^{(r)}},
+\boldsymbol{\Sigma}^{(t)} &=\dfrac{1}{R}\sum_{r=1}^{R}\paren{\dfrac{\sumi \paren{\mbf{Y}_i^{(r)*}}\paren{\mbf{Y}_i^{(r)*}}^T}{n}},\\
+\boldsymbol{\beta}_{0q}^{(t)} &= \onen\sumi \paren{\dfrac{1}{R}\sum_{r=1}^{R}Y_{iq}^{(r)}},
 \eal 
 where $\mbf{Y}^{(r)*}=\mbf{Y}_i^{(r)}-\boldsymbol{\beta}_0^{(t-1)}$.
 
@@ -104,8 +106,8 @@ where $\mbf{Y}^{(r)*}=\mbf{Y}_i^{(r)}-\boldsymbol{\beta}_0^{(t-1)}$.
 \FloatBarrier 
 \begin{algorithm}[ht!]
 \begin{algorithmic}[1]
-\Input $\mbf{Y}_i\in\R^{Q-1}$, $\mbf{W}_i$, $E[\mbf{Y}_i]$, $D$, $\boldsymbol{\Sigma}^{-1}$, iter, $v$
-\Output $\mbf{Y}^{MH}\in\R^{\text{iter}\times Q-1}$ (a MH sample matrix of $\mbf{Y}_i$)
+\Input $\mbf{Y}_i\in\R^{Q}$, $\mbf{W}_i$, $E[\mbf{Y}_i]$, $D$, $\boldsymbol{\Sigma}^{-1}$, iter, $v$
+\Output $\mbf{Y}^{MH}\in\R^{\text{iter}\times Q}$ (a MH sample matrix of $\mbf{Y}_i$)
 \For{$j=1,\ldots,$ iter}
 \State $\boldsymbol{\eps} \sim \N(0,v)$
 \State Propose $\mbf{Y}_i^* \gets \mbf{Y}_i+\boldsymbol{\eps}$
@@ -125,8 +127,8 @@ where $\mbf{Y}^{(r)*}=\mbf{Y}_i^{(r)}-\boldsymbol{\beta}_0^{(t-1)}$.
 
 \begin{algorithm}[ht!]
 \begin{algorithmic}[1]
-\Input $\mbf{Y}\in\R^{N\times Q-1}$, $\mbf{W}$, $E[\mbf{Y}]$, $D$, $\boldsymbol{\Sigma}^{-1}$, iter, $v$
-\Output $\mbf{Y}^{MH}\in\R^{\text{iter}\times Q-1\times N}$ (a MH sample array of $\mbf{Y}$)
+\Input $\mbf{Y}\in\R^{N\times Q}$, $\mbf{W}$, $E[\mbf{Y}]$, $D$, $\boldsymbol{\Sigma}^{-1}$, iter, $v$
+\Output $\mbf{Y}^{MH}\in\R^{\text{iter}\times Q\times N}$ (a MH sample array of $\mbf{Y}$)
 \For{$i=1,\ldots,$ iter}
 \State $\mbf{Y}^{MH}_{\cdot,\cdot,i} \gets$ \texttt{MCrow}($\cdots$)
 \EndFor
@@ -138,7 +140,7 @@ where $\mbf{Y}^{(r)*}=\mbf{Y}_i^{(r)}-\boldsymbol{\beta}_0^{(t-1)}$.
 
 \begin{algorithm}[ht!]
 \begin{algorithmic}[1]
-\Input  $\mbf{W}\in\R^{N\times Q}$, $D$,  iterEM, iterMC, burnEM, burnMC, $v$
+\Input  $\mbf{W}\in\R^{N\times Q+1}$, $D$,  iterEM, iterMC, burnEM, burnMC, $v$
 \Output $\hat{\boldsymbol{\beta}}$, $\hat{\boldsymbol{\Sigma}}$
 \State $\mbf{Y}\gets \texttt{logRatios}(\mbf{W},$ base $=D)$
 \State $\boldsymbol{\beta}^{(0)} \gets \texttt{colMeans}(\mbf{Y})$
