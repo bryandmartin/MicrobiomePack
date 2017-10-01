@@ -65,14 +65,15 @@ Finally, and importantly, this model is only well-defined when no proportions ar
 
 \subsection{Conditional Distribution of Latent Variables}
 
-The aim of using this distribution is the ability to solve for parameters $\boldsymbol{\mu}$ and $\boldsymbol{\Sigma}$ in order to inform us about our  compositions $\mbf{X}$ or $\mbf{Y}$. In doing so, we use our observed data $\mbf{W}$ to inform us about the distribution of latent $\mbf{Y}$. We denote the parameters of interest as $\boldsymbol{\eta}\equiv (\boldsymbol{\mu},\boldsymbol{\Sigma})$. Using the LNM model, we can write the conditional distribution
+With this distribution,  we denote the parameters of interest as $\boldsymbol{\eta}\equiv (\boldsymbol{\mu},\boldsymbol{\Sigma})$. This is made difficult as they are parameters describing the distribution of latent $\boldsymbol{Y}$. Thus, in order to estimate our parameters of interest, we use our observed data $\mbf{W}$.  Using the LNM model, we can write the conditional distribution
 \bal  \pi(\mbf{Y}_i|\mbf{W}_i;\boldsymbol{\eta}^{(t-1)}) &\propto P(\mbf{W}_i|\mbf{Y}_i) \times f(\mbf{Y}_i|\boldsymbol{\eta}^{(t-1)})\eal 
 The latter distribution is given by Equation~\eqref{eq:fyeta}. For the former, note that by the definition of $\phi^{-1}()$, we can fully recover $\mbf{X}_i$ given $\mbf{Y}_i$. Thus: 
 \bal 
 P(\mbf{W}_i|\mbf{Y}_i) &= P(\mbf{W}_i|\mbf{X}_i), \\ 
 &= \prod_{q=1}^{Q+1} (X_{iq})^{W_{iq}},\\
 &= X_{i,Q+1}^{W_{i,Q+1}}\prod_{q=1}^{Q} (\phi^{-1}(\mbf{Y}_i))_q^{W_{iq}},\\
-&\propto \paren{\dfrac{ \exp{Y_{i1}}}{\brack{\sum_{q=1}^Q \exp{Y_{i1}}+1}}}^{W_{i1}} \times \cdots \times \paren{\dfrac{ \exp{Y_{iQ}}}{\brack{\sum_{q=1}^Q \exp{Y_{iQ}}+1}}}^{W_{iQ}}.
+&= \paren{\dfrac{ 1}{\brack{\sum_{q=1}^Q \exp{Y_{iq}}+1}}}^{W_{i,Q+1}} \paren{\dfrac{ \exp{Y_{i1}}}{\brack{\sum_{q=1}^Q \exp{Y_{iq}}+1}}}^{W_{i1}} \times \cdots \\
+&\quad \times \paren{\dfrac{ \exp{Y_{iQ}}}{\brack{\sum_{q=1}^Q \exp{Y_{iq}}+1}}}^{W_{iQ}}.
 \eal
 Thus, we arrive at 
 \begin{equation}\label{eq:fullcond}
@@ -85,15 +86,18 @@ where $\mbf{Y}_i^{(t-1)*}\equiv \mbf{Y}_i- \boldsymbol{\mu}^{(t-1)}$.
 
 \section{MC-EM Algorithm}
 
-
+Ultimately, our goal is to estimate the complete data log-likelihood so that it can be maximized to solve for our parameters of interest. If $\mbf{Y}$ were observed,  then we could estimate $\hat{\boldsymbol{\eta}}$ using the known closed form solutions
+\bal 
+\hat{\boldsymbol{\mu}_i} &= \bar{\mbf{Y}_i},\\
+\hat{\boldsymbol{\Sigma}} &= \onen \sumi (\mbf{Y}_i - \bar{\mbf{Y}_i})(\mbf{Y}_i-\bar{\mbf{Y}_i})^T.
+\eal 
+However, we cannot do this because we do not directly observe $\mbf{Y}$. Instead, we approximate the complete data log-likelihood using the EM algorithm.
 
 In general, the EM algorithm iterates between two steps. The E-step computes the \textit{expected complete data log-likelihood}. This is the correct log-likelihood if we take the current parameter estimates as given. The M-step \textit{updates parameter estimates} given the log-likelihood from the E-step. The estimates are then used for the E-step of the following iteration.
 
 
 
 \noindent\textbf{E-Step}
-
-The MC-EM algorithm complicates the standard EM algorithm by including MH in the E-step. This is necessary in this case because the conditional distribution is difficult to integrate, thus we cannot get the conditional expectation in closed form.
 
 We aim to compute the expected complete data log-likelihood \bal 
 E[\ell(\boldsymbol{\eta})]&\equiv Q(\boldsymbol{\eta}|\boldsymbol{\eta}^{(t-1)}),\\
@@ -102,21 +106,29 @@ E[\ell(\boldsymbol{\eta})]&\equiv Q(\boldsymbol{\eta}|\boldsymbol{\eta}^{(t-1)})
 where the expectation is taken with respect to the conditional distribution of $\mbf{Y}_i|(\mbf{W}_i; \boldsymbol{\eta}^{(t-1)})$. This conditional distribution is  given by Equation~\eqref{eq:fullcond}. We may rewrite the conditional expectation as
 \bal 
 E_{\pi(\mbf{Y}_i|(\mbf{W}_i; \boldsymbol{\eta}^{(t-1)}))}&\brack{(\mbf{Y}_i-\boldsymbol{\mu})^T\boldsymbol{\Sigma}^{-1}(\mbf{Y}_i-\boldsymbol{\mu})} = \\
-&\int_{\Omega(\mbf{Y}_i)} (\mbf{Y}_i-\boldsymbol{\mu})^T\boldsymbol{\Sigma}^{-1}(\mbf{Y}_i-\boldsymbol{\mu})\pi(\mbf{Y}_i|(\mbf{W}_i; \boldsymbol{\eta}^{(t-1)})) d\mbf{Y}_i.
-\eal 
-Substituting in $\pi(\mbf{Y}_i|(\mbf{W}_i; \boldsymbol{\eta}^{(t-1)}))$ from Equation~\eqref{eq:fullcond}, we can see the difficulty of solving this integral analytically. Thus, in order to estimate it numerically, we can use the Metropolis-Hastings (MH) algorithm. We simulate proposals $\mbf{Y}_i\sim \N(\mbf{Y}_i^{(r-1)},v\mbf{I})$, and after burn-ins, we use these $R$ samples to approximate our expectation.
-
-Ultimately, the goal of the E-step is to estimate the complete data log-likelihood so that it can be maximized in the M-step. If $\mbf{Y}$ were observed,  then we could estimate $\hat{\boldsymbol{\eta}}$ using the known closed form solutions
+&\int_{\Omega(\mbf{Y}_i)} (\mbf{Y}_i-\boldsymbol{\mu})^T\boldsymbol{\Sigma}^{-1}(\mbf{Y}_i-\boldsymbol{\mu})\pi(\mbf{Y}_i|(\mbf{W}_i; \boldsymbol{\eta}^{(t-1)})) d\mbf{Y}_i.\eal 
+Substituting in $\pi(\mbf{Y}_i|(\mbf{W}_i; \boldsymbol{\eta}^{(t-1)}))$ from Equation~\eqref{eq:fullcond}, we can see the difficulty of solving this integral analytically. Thus, in order to estimate it numerically, we can use the Metropolis-Hastings (MH) algorithm. The MH algorithm allows us to approximate the conditional expectation integral above using simulations:
 \bal 
-\hat{\boldsymbol{\mu}_i} &= \bar{\mbf{Y}_i},\\
-\hat{\boldsymbol{\Sigma}} &= \onen \sumi (\mbf{Y}_i - \bar{\mbf{Y}_i})(\mbf{Y}_i-\bar{\mbf{Y}_i})^T.
+E_{\pi(\mbf{Y}_i|(\mbf{W}_i; \boldsymbol{\eta}^{(t-1)}))}&\brack{(\mbf{Y}_i-\boldsymbol{\mu})^T\boldsymbol{\Sigma}^{-1}(\mbf{Y}_i-\boldsymbol{\mu})} = \\
+&\approx \dfrac{1}{R} \sum_{r=1}^{R} (\mbf{Y}_i^{(r)}-\boldsymbol{\mu})^T\boldsymbol{\Sigma}^{-1}(\mbf{Y}_i^{(r)}-\boldsymbol{\mu})\pi(\mbf{Y}_i^{(r)}|(\mbf{W}_i; \boldsymbol{\eta}^{(t-1)})),
 \eal 
-However, we cannot do this because we do not directly observe $\mbf{Y}$. The MH algorithm allows us to approximate the conditional distribution and generate samples from this distribution. Instead of observed data, we use the average across the MH samples. Then maximizing $Q(\boldsymbol{\eta}|\boldsymbol{\eta}^{(t-1)})$ becomes equivalent to maximizing a standard MVN log-likelihood. The only difference is that instead of directly observing our samples, we approximate it from the output of the MH algorithm.
+where $\mbf{Y}_i^{(r)}$ represent simulated values. 
+
+ The MH algorithm allows us to approximate the conditional distribution by generating samples from  the known conditional posterior distribution. Instead of observed data, we use the average across the MH samples.
+
+
+In the MH algorithm, we simulate proposals $\mbf{Y}_i\sim \N(\mbf{Y}_i^{(r-1)},v\mbf{I})$.  We then calculate the Metropolis acceptance ratio 
+$$ r(\mbf{Y}_i|\mbf{Y}_i^{(r-1)}) = \min \paren{1,\dfrac{\pi(\mbf{Y}_i)}{\pi(\mbf{Y}_i^{(r-1)}}}.$$
+We then simulate $u\sim \text{Uniform}(0,1)$. We accept our proposal $\mbf{Y}_i$ if $u\leq r(\mbf{Y}_i|\mbf{Y}_i^{(r-1)})$. Otherwise, we repeat the previously simulated value. We then burn some simulations, and use the remaining $R$ samples to approximate our expectation. The pseudocode of this process is shown in Algorithm 1, \texttt{MCrow}.
+
+
 
 
 \noindent\textbf{M-step}
 
-Using our MH samples from the E-step to approximate the log-likelihood, updating to  $\boldsymbol{\eta}^{(t)}$ has closed form:
+With MH samples,  maximizing $Q(\boldsymbol{\eta}|\boldsymbol{\eta}^{(t-1)})$ becomes equivalent to maximizing a standard MVN log-likelihood. The only difference is that instead of directly observing our samples, we approximate it from the output of the MH algorithm. This allows us to use the same closed form solutions, substituting in the average MH sample for the observed data matrix.
+
+Thus, using our MH samples from the E-step to approximate the log-likelihood, updating to  $\boldsymbol{\eta}^{(t)}$ has closed form:
 \bal 
 \boldsymbol{\Sigma}^{(t)} &=\dfrac{1}{R}\sum_{r=1}^{R}\paren{\dfrac{\sumi \paren{\mbf{Y}_i^{(r)*}}\paren{\mbf{Y}_i^{(r)*}}^T}{n}},\\
 \boldsymbol{\mu}_{q}^{(t)} &= \onen\sumi \paren{\dfrac{1}{R}\sum_{r=1}^{R}Y_{iq}^{(r)}},
@@ -194,46 +206,63 @@ where $\mbf{Y}^{(r)*}=\mbf{Y}_i^{(r)}-\boldsymbol{\mu}^{(t-1)}$.
 
 
 
+\FloatBarrier 
+\section{Model Fit Plots}
 \FloatBarrier
 
-\newpage
+\begin{figure}[ht!]
+    \centering
+    \begin{subfigure}[b]{0.40\textheight}
+        \includegraphics[width=\textwidth]{Images/simpleMult11.pdf}
+        \caption{DayAmdmt = 11}
+        %\label{fig:gull}
+    \end{subfigure}
+\\
+    \begin{subfigure}[b]{0.40\textheight}
+        \includegraphics[width=\textwidth]{Images/simpleMult21.pdf}
+        \caption{DayAmdmt = 21}
+        %\label{fig:tiger}
+    \end{subfigure}
+    \caption{These images display the observed composition on the X-axis and the estimated proportions under a simple multinomial model on the Y-axis. The red lines represent the estimated variance of the estimated proportions. Clearly, this model does allow for an appropriate variance model. }\label{fig:simpMult}
+\end{figure}
 
-\section{Preliminary Results}
 
-The first figure is a replication of the figure from \cite{xia2013logistic}, except that now the results are portrayed on the compositional scale. Two models were fit, for \texttt{DayAmdmt} 11 and 21, respectively. The results are colored by model. Overall, it is difficult to compare models on this scale, though OTUs for which observed and fitted proportions were relatively high do suggest a meaningful difference between the groups.
 
-\grapher{CombinedFittingGraph.pdf}{5in}
+\clearpage
 
-The second figure is an attempt to better quantify the differences observed across models in the first figure. This figure takes the expected, or fitted, compositional value from the \texttt{DayAmdmt} 11  model, and subtracts the corresponding value of the \texttt{DayAmdmt} 21. It shows more clearly that there are three OTU indices for which the expected difference  is quite substantial.
+\begin{figure}[ht!]
+    \centering
+    \begin{subfigure}[b]{0.40\textheight}
+        \includegraphics[width=\textwidth]{Images/XiaPlotBars11.pdf}
+        \caption{DayAmdmt = 11}
+        %\label{fig:gull}
+    \end{subfigure}
+\\
+    \begin{subfigure}[b]{0.40\textheight}
+        \includegraphics[width=\textwidth]{Images/XiaPlotBars21.pdf}
+        \caption{DayAmdmt = 21}
+        %\label{fig:tiger}
+    \end{subfigure}
+    \caption{These images display the observed composition on the X-axis and $\phi^{-1}(\hat{\mu}_j)$ on the Y-axis. The estimated composition values are constant within columns. The red bars represent the empirical 95\% confidence interval for each estimated composition based on 10,000 simulations from the model fit.}\label{fig:compFitBar}
+\end{figure}
 
-\grapher{ExpectedCompDiff.pdf}{5in}
+\clearpage 
 
-The third figure displays the $\boldsymbol{\mu}$ with two sets of error bars for each model. The black error bars are the diagonal elements of $\boldsymbol{\Sigma}$. The red error bars are the observed standard deviation of the estimates of $\boldsymbol{\mu}$ across the EM iterations.
-
-\grapher{errorBars.pdf}{5in}
-
-The next four figures display the moving window variance plots for four different values of window width. They display, in order, $\var{p_i}_{11}$, $\var{\hat{p}_i}_{11}$, $\var{p_i}_{21}$, and $\var{\hat{p}_i}_{21}$. I have not included in these plots lines representing the multinomial variance $(np_i(1-p_i))$, because they are many orders of magnitude larger than the values displayed in the figures.
-
-\pagebreak
-$$\var{p_i}_{11}$$
-
-\grapher{movingWindowVarZ11.pdf}{5in}
-
-\pagebreak
-$$\var{\hat{p}_i}_{11}$$
-
-\grapher{movingWindowVarEZ11.pdf}{5in}
-
-\pagebreak
-$$\var{p_i}_{21}$$
-
-\grapher{movingWindowVarZ21.pdf}{5in}
-
-\pagebreak
-$$\var{\hat{p}_i}_{21}$$
-
-\grapher{movingWindowVarEZ21.pdf}{5in}
-
+\begin{figure}[ht!]
+    \centering
+    \begin{subfigure}[b]{0.40\textheight}
+        \includegraphics[width=\textwidth]{Images/XiaPlotWBars11.pdf}
+        \caption{DayAmdmt = 11}
+        %\label{fig:gull}
+    \end{subfigure}
+\\
+    \begin{subfigure}[b]{0.40\textheight}
+        \includegraphics[width=\textwidth]{Images/XiaPlotWBars21.pdf}
+        \caption{DayAmdmt = 21}
+        %\label{fig:tiger}
+    \end{subfigure}
+    \caption{These images display the square root of the observed counts $\mbf{W}$ on the X-axis and $\sqrt{n_i\phi^{-1}(\hat{\mu}_j)}$ on the Y-axis. The red dots represent the empirical 95\% confidence interval for each estimated point based on 10,000 simulations from the model fit. The larger points represent observed sample values that were outside of the estimated 95\% confidence interval. }\label{fig:FitBar}
+\end{figure}
 
 \bibliography{bib}
 
