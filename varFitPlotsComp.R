@@ -61,13 +61,13 @@ simpleMult <- function(W,main="Simple Multinomial Variance") {
   # phat_j = \sum_i W_ij / \sum_ij W_ij
   phatj <- colSums(W) / sum(W)
   Yaxis <- matrix(phatj,nrow=nrow(W),ncol=ncol(W),byrow=TRUE)
-  par(mar=c(6,6,4,1)+.1)
+  par(mar=c(9,9,4,3)+.1,cex.main=2)
   plot(Xaxis,Yaxis,pch=".",
        xlab="",
        ylab="",
        main=main)
-  mtext(expression(frac(W[ij],sum(W[ij],j))),side=1,line=5)
-  mtext(expression(frac(sum(W[ij],i),sum(W[ij],ij))),side=2,las=1,line=3)
+  mtext(expression(frac(W[ij],sum(W[ij],j))),side=1,line=8,cex=2)
+  mtext(expression(frac(sum(W[ij],i),sum(W[ij],ij))),side=2,las=1,line=3,cex=2)
   xx <- seq(0,max(makeComp(W))*1.1,length=100)
   lyy <- xx-2*sqrt(xx*(1-xx)/sum(W))
   uyy <- xx+2*sqrt(xx*(1-xx)/sum(W))
@@ -152,7 +152,7 @@ XiaPlotBars <- function(W,out,main="Composition Fitting Graph",niter=10000) {
   Z <- makeComp(W)
   # Mean squared prediction error
   MSPE <- mean(apply((eZ-Z)^2,1,sum)/apply(Z^2,1,sum)); round(MSPE,4)
-  par(mar=c(6,6,4,1)+.1)
+  par(mar=c(9,10,4,3)+.1,cex.main=2)
   plot(as.vector(Z),as.vector(eZ),
        xlab="",
        ylab="",
@@ -160,8 +160,8 @@ XiaPlotBars <- function(W,out,main="Composition Fitting Graph",niter=10000) {
        pch=20)
   #abline(a=0,b=1)
   mtext(paste( "(MSPE: ",round(MSPE,3),")",sep=""))
-  mtext(expression(frac(W[ij],sum(W[ij],j))),side=1,line=5)
-  mtext(expression(phi^{-1}~(hat(mu)[j])),side=2,las=1,line=3)
+  mtext(expression(frac(W[ij],sum(W[ij],j))),side=1,line=7.5,cex=2)
+  mtext(expression(phi^{-1}~(hat(mu)[j])),side=2,las=1,line=3,cex=2)
   
   X.m <- Xsim(out,niter=niter)
   # place bars at every expected value (arbitrary choice 1)
@@ -178,26 +178,26 @@ XiaPlotWBars <- function(W,out,main="Composition Fitting Graph",niter=10000) {
   eW <- YtoW(eY,M,base)
   # Mean squared prediction error
   MSPE <- mean(apply((eW-W)^2,1,sum)/apply(W^2,1,sum)); round(MSPE,4)
-  par(mar=c(5,7,4,1)+.1)
-  plot(as.vector(W),as.vector(eW),
+  par(mar=c(6,12,4,6)+.1,cex.main=2)
+  plot(sqrt(as.vector(W)),sqrt(as.vector(eW)),
        xlab="",
        ylab="",
        main=main,
        pch=".")
   #abline(a=0,b=1)
   mtext(paste( "(MSPE: ",round(MSPE,3),")",sep=""))
-  mtext(expression(W[ij]),side=1,line=3)
-  mtext(expression(n[i]~phi^{-1}~(hat(mu)[j])),side=2,las=1,line=3)
+  mtext(expression(sqrt(W[ij])),side=1,line=4,cex=2)
+  mtext(expression(sqrt(n[i]~phi^{-1}~(hat(mu)[j]))),side=2,las=1,line=2.5,cex=2)
   
   W.m <- Wsim(out=out,W=W,niter=niter)
   # place bars at every expected value (arbitrary choice 1)
   ePointsL <- apply(W.m,c(1,2),quantile,probs=c(0.025))
   ePointsH <- apply(W.m,c(1,2),quantile,probs=c(0.975))
-  points(as.vector(W),as.vector(ePointsL),col="red",pch=".")
-  points(as.vector(W),as.vector(ePointsH),col="red",pch=".")
-  points(as.vector(W),as.vector(eW),pch=".")
-  points(as.vector(W)[as.vector(W)>as.vector(ePointsH)],as.vector(eW)[as.vector(W)>as.vector(ePointsH)],pch=20)
-  points(as.vector(W)[as.vector(W)<as.vector(ePointsL)],as.vector(eW)[as.vector(W)<as.vector(ePointsL)],pch=20)
+  points(sqrt(as.vector(W)),sqrt(as.vector(ePointsL)),col="red",pch=".")
+  points(sqrt(as.vector(W)),sqrt(as.vector(ePointsH)),col="red",pch=".")
+  points(sqrt(as.vector(W)),sqrt(as.vector(eW)),pch=".")
+  points(sqrt(as.vector(W))[as.vector(W)>as.vector(ePointsH)],sqrt(as.vector(eW))[as.vector(W)>as.vector(ePointsH)],pch=20)
+  points(sqrt(as.vector(W))[as.vector(W)<as.vector(ePointsL)],sqrt(as.vector(eW))[as.vector(W)<as.vector(ePointsL)],pch=20)
 }
 
 
@@ -215,6 +215,6 @@ savePDF("093017VarPlots/XiaPlotBars11.pdf",XiaPlotBars(W11,out11,main="Compositi
 savePDF("093017VarPlots/XiaPlotBars21.pdf",XiaPlotBars(W21,out21,main="Composition Fitting Graph (21)"))
 
 
-savePDF("093017VarPlots/XiaPlotW11.pdf",XiaPlotWBars(W11,out11,main="Observed Data Fitting Graph (11)"))
-savePDF("093017VarPlots/XiaPlotW21.pdf",XiaPlotWBars(W21,out21,main="Observed Data Fitting Graph (21)"))
+savePDF("093017VarPlots/XiaPlotWBars11.pdf",XiaPlotWBars(W11,out11,main="Observed Data Fitting Graph (11)"))
+savePDF("093017VarPlots/XiaPlotWBars21.pdf",XiaPlotWBars(W21,out21,main="Observed Data Fitting Graph (21)"))
 
