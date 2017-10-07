@@ -1,6 +1,6 @@
 # Microbiome
 
-## Description of Files (9/30)
+## Description of Files (10/6)
 
 * **Master Folder:** This folder contains the full LaTeX for generating the master pdf. It is intended for personal use to track changes and keep a backup.
 * **XiaChenFungLiModel.R:** Complete implementaion of the MC-EM model from Xia et al. (2013)
@@ -10,6 +10,7 @@
 * **HQQModel.R:** Implementation of a simple posterior predictive Dirichlet-Multinomial distribution.
 * **fittingPlots.R:** Compares DayAmdmt 11 and 21, contains code for various plots.
 * **varFitPlotsComp.R:** Contains code for plotting variance fit for simple multinomial, composition, and observed count 
+* **OTU300run.R:** Contains code for generating fitting plots with random selection of 300 OTUs
 
 ## Notes
 
