@@ -5,14 +5,15 @@ load("~/Google Drive/Daniela/Microbiome/output1121.RData")
 
 # Just for fancy CM font plots, ignore
 {
-# require("extrafont")
-# require("fontcm")
+ require("extrafont")
+ require("fontcm")
 # Takes a few
 # font_import()
 # font_install("fontcm")
 # loadfonts()
 }
-
+# Functions - TODO - wrap in file for sourcing
+{
 savePDF <- function(filepath,img,latex=TRUE) {
   if(latex==TRUE) {
     pdf(filepath,family="CM Roman")
@@ -62,7 +63,7 @@ simpleMult <- function(W,main="Simple Multinomial Variance") {
   phatj <- colSums(W) / sum(W)
   Yaxis <- matrix(phatj,nrow=nrow(W),ncol=ncol(W),byrow=TRUE)
   par(mar=c(9,9,4,3)+.1,cex.main=2)
-  plot(Xaxis,Yaxis,pch=".",
+  plot(Xaxis,Yaxis,pch=20,
        xlab="",
        ylab="",
        main=main)
@@ -131,21 +132,23 @@ Wsim <- function(out,W,niter=1000) {
   return(W.m)
 }
 
-Xsim <- function(out,niter=1000) {
+Xsim <- function(out,W,niter=1000) {
   require(MASS)
   N <- nrow(out$Y); Q <- ncol(out$Y)+1; base <- out$base
   X.m <- array(0,dim=c(N,Q,niter))
+  M <- apply(W,1,sum)
   for(i in 1:niter) {
     # set up Y
     # take mu, sigma, simulate N Y_i's
     Y.m <- mvrnorm(n=N,mu=out$mu,Sigma=out$sigma)
-    X.m[,,i] <- YtoX(Y=Y.m,base=base)
+    W.m <- YtoW(Y=Y.m,M=M,base=base)
+    X.m[,,i] <- makeComp(W.m)
   }
   return(X.m)
 }
 
 
-XiaPlotBars <- function(W,out,main="Composition Fitting Graph",niter=10000) {
+XiaPlotBars <- function(W,out,main="Composition Fitting Graph",niter=10000,diagV=FALSE,smallV = FALSE,sub=FALSE) {
   N <- nrow(out$Y); Q <- ncol(out$Y)+1; base <- out$base
   eY <- tcrossprod(rep(1,N), out$mu)
   eZ <- YtoX(eY,base)
@@ -159,16 +162,71 @@ XiaPlotBars <- function(W,out,main="Composition Fitting Graph",niter=10000) {
        main=main,
        pch=20)
   #abline(a=0,b=1)
-  mtext(paste( "(MSPE: ",round(MSPE,3),")",sep=""))
   mtext(expression(frac(W[ij],sum(W[ij],j))),side=1,line=7.5,cex=2)
   mtext(expression(phi^{-1}~(hat(mu)[j])),side=2,las=1,line=3,cex=2)
   
-  X.m <- Xsim(out,niter=niter)
+  if(diagV==TRUE) {
+    temp <- matrix(0,Q-1,Q-1)
+    diag(temp) <- diag(out$sigma)
+    out$sigma <- temp
+  }
+  if(smallV==TRUE) {
+    temp <- matrix(0,Q-1,Q-1)
+    diag(temp) <- 1e-4
+    out$sigma <- temp
+  }
+  if(sub!=FALSE) {
+    mtext(sub)
+  } else if (sub==FALSE) {
+    mtext(paste( "(MSPE: ",round(MSPE,3),")",sep=""))
+  }
+  X.m <- Xsim(out,W,niter=niter)
   # place bars at every expected value (arbitrary choice 1)
   eBarY <- eZ[1,]
   eBarX1 <- apply(X.m,2,quantile,probs=c(0.025))
   eBarX2 <- apply(X.m,2,quantile,probs=c(0.975))
   arrows(eBarX1,eBarY,eBarX2,eBarY,col="red",code=3,angle=90,length=0.01)
+}
+
+XiaPlotBarsT <- function(W,out,main="Composition Fitting Graph",niter=1000,diagV=FALSE,smallV = FALSE,sub=FALSE) {
+  N <- nrow(out$Y); Q <- ncol(out$Y)+1; base <- out$base
+  eY <- tcrossprod(rep(1,N), out$mu)
+  eZ <- YtoX(eY,base)
+  Z <- makeComp(W)
+  # Mean squared prediction error
+  MSPE <- mean(apply((eZ-Z)^2,1,sum)/apply(Z^2,1,sum)); round(MSPE,4)
+  par(mar=c(4.5,9,4,3)+.1,cex.main=2)
+  eZ <- Z
+  Z <- rep(1:Q,each=16)
+  plot(as.vector(Z),as.vector(eZ),
+       xlab="",
+       ylab="",
+       main=main,
+       pch=20)
+  #abline(a=0,b=1)
+  mtext("OTU Index",side=1,line=3,cex=2)
+  mtext(expression(frac(W[ij],sum(W[ij],j))),side=2,las=1,line=3,cex=2)
+  if(diagV==TRUE) {
+    temp <- matrix(0,Q-1,Q-1)
+    diag(temp) <- diag(out$sigma)
+    out$sigma <- temp
+  }
+  if(smallV==TRUE) {
+    temp <- matrix(0,Q-1,Q-1)
+    diag(temp) <- 1e-4
+    out$sigma <- temp
+  }
+  if(sub!=FALSE) {
+    mtext(sub)
+  } else if (sub==FALSE) {
+    mtext(paste( "(MSPE: ",round(MSPE,3),")",sep=""))
+  }
+  X.m <- Xsim(out,W,niter=niter)
+  # place bars at every expected value (arbitrary choice 1)
+  eBarX <- 1:Q
+  eBarY1 <- apply(X.m,2,quantile,probs=c(0.025))
+  eBarY2 <- apply(X.m,2,quantile,probs=c(0.975))
+  arrows(eBarX,eBarY1,eBarX,eBarY2,col="red",code=3,angle=90,length=0.01)
 }
 
 XiaPlotWBars <- function(W,out,main="Composition Fitting Graph",niter=10000) {
@@ -199,22 +257,26 @@ XiaPlotWBars <- function(W,out,main="Composition Fitting Graph",niter=10000) {
   points(sqrt(as.vector(W))[as.vector(W)>as.vector(ePointsH)],sqrt(as.vector(eW))[as.vector(W)>as.vector(ePointsH)],pch=20)
   points(sqrt(as.vector(W))[as.vector(W)<as.vector(ePointsL)],sqrt(as.vector(eW))[as.vector(W)<as.vector(ePointsL)],pch=20)
 }
+}
+niter <- 10000;
+savePDF("100517VarPlots/simpleMult11.pdf",simpleMult(W11,main="Simple Multinomial Variance"))
+savePDF("100517VarPlots/XiaPlotBars11.pdf",XiaPlotBars(W11,out11,main="Observed Data Fitting Graph",niter=niter,sub="(Full Sigma)"))
+savePDF("100517VarPlots/XiaPlotBars11diag.pdf",XiaPlotBars(W11,out11,main="Observed Data Fitting Graph",niter=niter,diagV=TRUE,sub="(Diagonal Sigma)"))
+savePDF("100517VarPlots/XiaPlotBars11small.pdf",XiaPlotBars(W11,out11,main="Observed Data Fitting Graph",niter=niter,smallV=TRUE,sub="(Small Sigma)"))
 
+savePDF("100517VarPlots/XiaPlotBars11T.pdf",XiaPlotBarsT(W11,out11,main="Observed Data Fitting Graph",niter=niter,sub="(Full Sigma)"))
+dev.off();dev.off()
+savePDF("100517VarPlots/XiaPlotBars11diagT.pdf",XiaPlotBarsT(W11,out11,main="Observed Data Fitting Graph",niter=niter,diagV=TRUE,sub="(Diagonal Sigma)"))
+dev.off();dev.off()
+savePDF("100517VarPlots/XiaPlotBars11smallT.pdf",XiaPlotBarsT(W11,out11,main="Observed Data Fitting Graph",niter=niter,smallV=TRUE,sub="(Small Sigma)"))
+dev.off();dev.off()
 
-savePDF("093017VarPlots/simpleMult11.pdf",simpleMult(W11,main="Simple Multinomial Variance (11)"))
-savePDF("093017VarPlots/simpleMult21.pdf",simpleMult(W21,main="Simple Multinomial Variance (21)"))
+#savePDF("093017VarPlots/XiaPlot11.pdf",XiaPlot(W11,out11,main="Composition Fitting Graph"))
+#savePDF("093017VarPlots/XiaPlotW11.pdf",XiaPlotW(W11,out11,main="Observed Data Fitting Graph"))
+#savePDF("093017VarPlots/simpleMult21.pdf",simpleMult(W21,main="Simple Multinomial Variance (21)"))
+#savePDF("093017VarPlots/XiaPlot21.pdf",XiaPlot(W21,out21,main="Composition Fitting Graph (21)"))
+#savePDF("093017VarPlots/XiaPlotW21.pdf",XiaPlotW(W21,out21,main="Observed Data Fitting Graph (21)"))
+#savePDF("093017VarPlots/XiaPlotBars21.pdf",XiaPlotBars(W21,out21,main="Composition Fitting Graph (21)"))
+#savePDF("093017VarPlots/XiaPlotWBars21.pdf",XiaPlotWBars(W21,out21,main="Observed Data Fitting Graph (21)"))
 
-savePDF("093017VarPlots/XiaPlot11.pdf",XiaPlot(W11,out11,main="Composition Fitting Graph (11)"))
-savePDF("093017VarPlots/XiaPlot21.pdf",XiaPlot(W21,out21,main="Composition Fitting Graph (21)"))
-
-
-savePDF("093017VarPlots/XiaPlotW11.pdf",XiaPlotW(W11,out11,main="Observed Data Fitting Graph (11)"))
-savePDF("093017VarPlots/XiaPlotW21.pdf",XiaPlotW(W21,out21,main="Observed Data Fitting Graph (21)"))
-
-savePDF("093017VarPlots/XiaPlotBars11.pdf",XiaPlotBars(W11,out11,main="Composition Fitting Graph (11)"))
-savePDF("093017VarPlots/XiaPlotBars21.pdf",XiaPlotBars(W21,out21,main="Composition Fitting Graph (21)"))
-
-
-savePDF("093017VarPlots/XiaPlotWBars11.pdf",XiaPlotWBars(W11,out11,main="Observed Data Fitting Graph (11)"))
-savePDF("093017VarPlots/XiaPlotWBars21.pdf",XiaPlotWBars(W21,out21,main="Observed Data Fitting Graph (21)"))
 
