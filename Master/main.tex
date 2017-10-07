@@ -207,22 +207,16 @@ where $\mbf{Y}^{(r)*}=\mbf{Y}_i^{(r)}-\boldsymbol{\mu}^{(t-1)}$.
 
 
 \FloatBarrier 
+\clearpage
 \section{Model Fit Plots}
+
+Due to the increase in the number of model fitting plots, currently this section only contains code for \texttt{DayAmdmt} = 11.
+
 \FloatBarrier
 
 \begin{figure}[ht!]
     \centering
-    \begin{subfigure}[b]{0.40\textheight}
-        \includegraphics[width=\textwidth]{Images/simpleMult11.pdf}
-        \caption{DayAmdmt = 11}
-        %\label{fig:gull}
-    \end{subfigure}
-\\
-    \begin{subfigure}[b]{0.40\textheight}
-        \includegraphics[width=\textwidth]{Images/simpleMult21.pdf}
-        \caption{DayAmdmt = 21}
-        %\label{fig:tiger}
-    \end{subfigure}
+        \includegraphics[width=.75\textwidth]{Images/simpleMult11.pdf}
     \caption{These images display the observed composition on the X-axis and the estimated proportions under a simple multinomial model on the Y-axis. The red lines represent the estimated variance of the estimated proportions. Clearly, this model does allow for an appropriate variance model. }\label{fig:simpMult}
 \end{figure}
 
@@ -232,22 +226,109 @@ where $\mbf{Y}^{(r)*}=\mbf{Y}_i^{(r)}-\boldsymbol{\mu}^{(t-1)}$.
 
 \begin{figure}[ht!]
     \centering
-    \begin{subfigure}[b]{0.40\textheight}
+    \begin{subfigure}[b]{0.38\textheight}
         \includegraphics[width=\textwidth]{Images/XiaPlotBars11.pdf}
-        \caption{DayAmdmt = 11}
+        \caption{Observed compositional fit vs model estimate.}
         %\label{fig:gull}
     \end{subfigure}
 \\
-    \begin{subfigure}[b]{0.40\textheight}
-        \includegraphics[width=\textwidth]{Images/XiaPlotBars21.pdf}
-        \caption{DayAmdmt = 21}
+    \begin{subfigure}[b]{0.38\textheight}
+        \includegraphics[width=\textwidth]{Images/XiaPlotBars11T.pdf}
+        \caption{Observed compositional fit vs model estimate, by OTU.}
         %\label{fig:tiger}
     \end{subfigure}
-    \caption{These images display the observed composition on the X-axis and $\phi^{-1}(\hat{\mu}_j)$ on the Y-axis. The estimated composition values are constant within columns. The red bars represent the empirical 95\% confidence interval for each estimated composition based on 10,000 simulations from the model fit.}\label{fig:compFitBar}
+    \caption{The first image displays the observed composition on the X-axis and $\phi^{-1}(\hat{\mu}_j)$ on the Y-axis. The latter plot separates the data by OTU index. The estimated composition values are constant within columns. The red bars represent the empirical 95\% confidence interval for each estimated composition based on 10,000 simulations from the model fit using the full $\hat{\boldsymbol{\Sigma}}$.}\label{fig:compFitBar}
 \end{figure}
 
 \clearpage 
 
+\begin{figure}[ht!]
+    \centering
+    \begin{subfigure}[b]{0.38\textheight}
+        \includegraphics[width=\textwidth]{Images/XiaPlotBars11diag.pdf}
+        \caption{Observed compositional fit vs model estimate, using a diagonal covariance.}
+        %\label{fig:gull}
+    \end{subfigure}
+\\
+    \begin{subfigure}[b]{0.38\textheight}
+        \includegraphics[width=\textwidth]{Images/XiaPlotBars11diagT.pdf}
+        \caption{Observed compositional fit vs model estimate, by OTU, using a diagonal covariance.}
+        %\label{fig:tiger}
+    \end{subfigure}
+    \caption{The first image displays the observed composition on the X-axis and $\phi^{-1}(\hat{\mu}_j)$ on the Y-axis. The latter plot separates the data by OTU index. The estimated composition values are constant within columns. The red bars represent the empirical 95\% confidence interval for each estimated composition based on 10,000 simulations from the model fit using only the diagonal of $\hat{\boldsymbol{\Sigma}}$.}\label{fig:compFitBarDiag}
+\end{figure}
+
+\clearpage 
+
+\begin{figure}[ht!]
+    \centering
+    \begin{subfigure}[b]{0.38\textheight}
+        \includegraphics[width=\textwidth]{Images/XiaPlotBars11small.pdf}
+        \caption{Observed compositional fit vs model estimate, using a small diagonal covariance.}
+        %\label{fig:gull}
+    \end{subfigure}
+\\
+    \begin{subfigure}[b]{0.38\textheight}
+        \includegraphics[width=\textwidth]{Images/XiaPlotBars11smallT.pdf}
+        \caption{Observed compositional fit vs model estimate, by OTU, using a small diagonal covariance.}
+        %\label{fig:tiger}
+    \end{subfigure}
+    \caption{The first image displays the observed composition on the X-axis and $\phi^{-1}(\hat{\mu}_j)$ on the Y-axis. The latter plot separates the data by OTU index. The estimated composition values are constant within columns. The red bars represent the empirical 95\% confidence interval for each estimated composition based on 10,000 simulations from the model fit using only a diagonal matrix with diagonal values equal to $10^{-5}$ for $\hat{\boldsymbol{\Sigma}}$.}\label{fig:compFitBarSmall}
+\end{figure}
+
+\clearpage 
+
+\begin{figure}[ht!]
+    \centering
+    \begin{subfigure}[b]{0.38\textheight}
+        \includegraphics[width=\textwidth]{Images/XiaPlotBars295v5.pdf}
+        \caption{Observed compositional fit vs model estimate, using the five most frequent OTUs, and 295 randomly selected OTUs.}
+        %\label{fig:gull}
+    \end{subfigure}
+\\
+    \begin{subfigure}[b]{0.34\textheight}
+        \includegraphics[width=\textwidth]{Images/XiaPlotBars295v5T.pdf}
+        \caption{Observed compositional fit vs model estimate, using the five most frequent OTUs, and 295 randomly selected OTUs, by OTU index.}
+        %\label{fig:tiger}
+    \end{subfigure}
+    \caption{The first image displays the observed composition on the X-axis and $\phi^{-1}(\hat{\mu}_j)$ on the Y-axis, with the five most frequent OTUs and 295 randomly selected OTUs. The latter plot separates the data by OTU index. The estimated composition values are constant within columns. The red bars represent the empirical 95\% confidence interval for each estimated composition based on 10,000 simulations from the model fit using $\hat{\boldsymbol{\Sigma}}$.}\label{fig:compFitBar295}
+\end{figure}
+
+\clearpage 
+
+\begin{figure}[ht!]
+    \centering
+    \begin{subfigure}[b]{0.38\textheight}
+        \includegraphics[width=\textwidth]{Images/XiaPlotBars300.pdf}
+        \caption{Observed compositional fit vs model estimate, using 300 randomly selected OTUs.}
+        %\label{fig:gull}
+    \end{subfigure}
+\\
+    \begin{subfigure}[b]{0.38\textheight}
+        \includegraphics[width=\textwidth]{Images/XiaPlotBars300T.pdf}
+        \caption{Observed compositional fit vs model estimate, using 300 randomly selected OTUs, by OTU index.}
+        %\label{fig:tiger}
+    \end{subfigure}
+    \caption{The first image displays the observed composition on the X-axis and $\phi^{-1}(\hat{\mu}_j)$ on the Y-axis, with 300 randomly selected OTUs. The latter plot separates the data by OTU index. The estimated composition values are constant within columns. The red bars represent the empirical 95\% confidence interval for each estimated composition based on 10,000 simulations from the model fit using $\hat{\boldsymbol{\Sigma}}$.}\label{fig:compFitBar300}
+\end{figure}
+
+\FloatBarrier
+\clearpage 
+
+
+\bibliography{bib}
+
+\end{document}
+
+
+
+
+
+
+
+
+
+\begin{comment}
 \begin{figure}[ht!]
     \centering
     \begin{subfigure}[b]{0.40\textheight}
@@ -263,16 +344,4 @@ where $\mbf{Y}^{(r)*}=\mbf{Y}_i^{(r)}-\boldsymbol{\mu}^{(t-1)}$.
     \end{subfigure}
     \caption{These images display the square root of the observed counts $\mbf{W}$ on the X-axis and $\sqrt{n_i\phi^{-1}(\hat{\mu}_j)}$ on the Y-axis. The red dots represent the empirical 95\% confidence interval for each estimated point based on 10,000 simulations from the model fit. The larger points represent observed sample values that were outside of the estimated 95\% confidence interval. }\label{fig:FitBar}
 \end{figure}
-
-\bibliography{bib}
-
-\end{document}
-
-
-
-
-
-
-
-
-
+\end{comment}
