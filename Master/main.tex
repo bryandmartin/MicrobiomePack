@@ -312,6 +312,43 @@ Due to the increase in the number of model fitting plots, currently this section
     \caption{The first image displays the observed composition on the X-axis and $\phi^{-1}(\hat{\mu}_j)$ on the Y-axis, with 300 randomly selected OTUs. The latter plot separates the data by OTU index. The estimated composition values are constant within columns. The red bars represent the empirical 95\% confidence interval for each estimated composition based on 10,000 simulations from the model fit using $\hat{\boldsymbol{\Sigma}}$.}\label{fig:compFitBar300}
 \end{figure}
 
+
+\clearpage 
+
+\begin{figure}[ht!]
+    \centering
+    \begin{subfigure}[b]{0.36\textheight}
+        \includegraphics[width=\textwidth]{Images/DMM250.pdf}
+        \caption{Observed compositional fit vs model estimate, using the 50 most frequent OTUs and 250 randomly selected OTUs.}
+        %\label{fig:gull}
+    \end{subfigure}
+\\
+    \begin{subfigure}[b]{0.36\textheight}
+        \includegraphics[width=\textwidth]{Images/DMM250T.pdf}
+        \caption{Observed compositional fit vs model estimate, the 50 most frequent OTUs and 250 randomly selected OTUs, by OTU index.}
+        %\label{fig:tiger}
+    \end{subfigure}
+    \caption{The first image displays the observed composition on the X-axis and the scaled Dirichlet component estimates on the Y-axis, with the 50 most frequent OTUs and 250 randomly selected OTUs. The latter plot separates the data by OTU index. The estimated composition values are constant within columns. The red bars represent the 95\% confidence interval for each estimated composition.}\label{fig:dmmFitBar250}
+\end{figure}
+
+\clearpage 
+
+\begin{figure}[ht!]
+    \centering
+    \begin{subfigure}[b]{0.36\textheight}
+        \includegraphics[width=\textwidth]{Images/DMM300.pdf}
+        \caption{Observed compositional fit vs model estimate, using 300 randomly selected OTUs.}
+        %\label{fig:gull}
+    \end{subfigure}
+\\
+    \begin{subfigure}[b]{0.36\textheight}
+        \includegraphics[width=\textwidth]{Images/DMM300T.pdf}
+        \caption{Observed compositional fit vs model estimate, the 300 randomly selected OTUs, by OTU index.}
+        %\label{fig:tiger}
+    \end{subfigure}
+    \caption{The first image displays the observed composition on the X-axis and the scaled Dirichlet component estimates on the Y-axis, with 300 randomly selected OTUs. The latter plot separates the data by OTU index. The estimated composition values are constant within columns. The red bars represent the 95\% confidence interval for each estimated composition.}\label{fig:dmmFitBar300}
+\end{figure}
+
 \FloatBarrier
 \clearpage 
 
