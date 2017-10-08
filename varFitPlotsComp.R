@@ -197,7 +197,7 @@ XiaPlotBarsT <- function(W,out,main="Composition Fitting Graph",niter=1000,diagV
   MSPE <- mean(apply((eZ-Z)^2,1,sum)/apply(Z^2,1,sum)); round(MSPE,4)
   par(mar=c(4.5,9,4,3)+.1,cex.main=2)
   eZ <- Z
-  Z <- rep(1:Q,each=16)
+  Z <- rep(1:Q,each=N)
   plot(as.vector(Z),as.vector(eZ),
        xlab="",
        ylab="",
