@@ -65,6 +65,11 @@ LNM.EM <- function(W, base, EMiter = 10, EMburn = 5, MCiter = 1000, MCburn = 500
         sigSumFun <- function(i) {
             return(crossprod(t(MCarray[i, 2:Q, 1:N]) - eY))
         }
+        if (poorman == TRUE) {
+          sigSumFun <- function(i) {
+            return(diag(apply( (t(MCarray[i, 2:Q, 1:N]) - eY), 2, var)) * N)
+          }
+        }
         sigSum <- foreach(i = (MCburn + 1):MCiter, .combine = "+") %do% sigSumFun(i)
         
         sigma <- sigSum/(N * (MCiter - MCburn))
