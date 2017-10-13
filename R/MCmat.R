@@ -27,10 +27,9 @@ MCmat <- function(Y, W, eY, N, Q, base, sigma, MCiter, stepsize = 1, poorman = F
             stepsize = stepsize)
     }
     # To remove parallel: comment out registerDoP, chagne %dopar% to %do%, comment out stopI
-    i <- 1:N
     registerDoParallel(detectCores())
     Y.MH <- # foreach(i=1:N,.combine='acomb3',.multicombine=TRUE) %do% {
-    foreach(i, .combine = "acomb3", .multicombine = TRUE) %dopar% {
+    foreach(i = 1:N, .combine = "acomb3", .multicombine = TRUE) %dopar% {
         MH_path(i)
     }
     
