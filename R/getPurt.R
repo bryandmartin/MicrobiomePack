@@ -4,7 +4,7 @@
 #'
 #' @param Wi raw count data row
 #' @param base base OTU value
-#' @param purt how much to purturb zero counts, defaults to 0.05
+#' @param p how much to purturb zero counts, defaults to 0.05
 #'
 #' @export
 getPurt <- function(Wi,base,p=0.05) {

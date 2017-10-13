@@ -7,17 +7,15 @@
 #'
 #' @import stats
 #' @import readr
-#' @import tibble
-#' @import dplyr
-#' @import compositions
-#' @import DirichletMultinomial
 #' @import extrafont
 #' @import fontcm
-#' @import MASS
+#' @importFrom MASS mvrnorm
 #' @import doParallel
 #' @import abind
 #' @import doSNOW
 #' @import PDSCE
+#' @import grDevices
+#' @import graphics
 #'
 #' @name MicrobiomePack-package
 #' @aliases MicrobiomePack

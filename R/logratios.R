@@ -4,7 +4,7 @@
 #'
 #' @param W raw count data, with OTUs as columns
 #' @param base base OTU value
-#' @param purt how much to purturb zero counts, defaults to 0.05
+#' @param p how much to purturb zero counts, defaults to 0.05
 #'
 #' @export
 logratios <- function(W,base,p=0.05) {
