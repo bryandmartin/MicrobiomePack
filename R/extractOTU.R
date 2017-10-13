@@ -9,12 +9,12 @@
 #' @export
 extractOTU <- function(W, nrand, nmost) {
     if (nmost >= 1) {
-        mostI <- whichpart(colSums(x), n = nmost)
-        leftO <- seq(dim(x)[2])[-mostI]
+        mostI <- whichpart(colSums(W), n = nmost)
+        leftO <- seq(dim(W)[2])[-mostI]
         randI <- sample(leftO, nrand)
-        return(x[, c(mostI, randI)])
+        return(W[, c(mostI, randI)])
     } else {
-        randI <- sample(seq(dim(x)[2]), nrand)
-        return(x[, c(randI)])
+        randI <- sample(seq(dim(W)[2]), nrand)
+        return(W[, c(randI)])
     }
 }

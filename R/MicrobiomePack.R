@@ -10,12 +10,14 @@
 #' @import extrafont
 #' @import fontcm
 #' @importFrom MASS mvrnorm
+#' @importFrom parallel detectCores
 #' @import doParallel
 #' @import abind
 #' @import doSNOW
 #' @import PDSCE
 #' @import grDevices
 #' @import graphics
+#' @import foreach
 #'
 #' @name MicrobiomePack-package
 #' @aliases MicrobiomePack
