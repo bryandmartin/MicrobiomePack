@@ -18,7 +18,11 @@
 #' @import grDevices
 #' @import graphics
 #' @import foreach
+#' @importFrom utils globalVariables
 #'
 #' @name MicrobiomePack-package
 #' @aliases MicrobiomePack
 NULL
+
+## Quiets global binding variables warning when using 'i' in foreach
+if (getRversion() >= "2.15.1") utils::globalVariables(c("i"))
