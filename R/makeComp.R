@@ -6,5 +6,5 @@
 #'
 #' @export
 makeComp <- function(W) {
-  return(W/rowSums(W))
+    return(W/rowSums(W))
 }

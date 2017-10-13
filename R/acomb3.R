@@ -4,4 +4,4 @@
 #'
 #' @param ... Array
 #' @export
-acomb3 <- function(...) abind(...,along=3)
+acomb3 <- function(...) abind(..., along = 3)
