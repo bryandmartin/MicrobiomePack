@@ -6,6 +6,9 @@
 \usage{
 acomb3(...)
 }
+\arguments{
+\item{...}{Array}
+}
 \description{
 This function works like cbind, but along the third dimension of an array
 }

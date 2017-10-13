@@ -11,7 +11,7 @@ getPurt(Wi, base, p = 0.05)
 
 \item{base}{base OTU value}
 
-\item{purt}{how much to purturb zero counts, defaults to 0.05}
+\item{p}{how much to purturb zero counts, defaults to 0.05}
 }
 \description{
 This function purturbates a row of the raw count matrix. Likely will not be used directly.

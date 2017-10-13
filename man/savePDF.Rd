@@ -11,7 +11,7 @@ savePDF(filepath, img, latex = TRUE)
 
 \item{img}{command used to generate a plot}
 
-\item{latex}{whether to use Computer Modern font, defaults to true. Note if there are issues may need font_import(), font_install("fontcm"), loadfonts()}
+\item{latex}{whether to use Computer Modern font, defaults to true. Note if there are issues may need font_import(), font_install('fontcm'), loadfonts()}
 }
 \description{
 This function saves a pdf image to a given filepath, with LaTeX fonts
