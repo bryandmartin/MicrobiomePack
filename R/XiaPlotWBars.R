@@ -12,9 +12,9 @@ XiaPlotWBars <- function(W, X = NULL, out, main = "Composition Fitting Graph", n
     N <- nrow(out$Y)
     base <- out$base
     if (is.null(X)) {
-      eY <- tcrossprod(rep(1, N), get_mu(out))
+        eY <- tcrossprod(rep(1, N), get_mu(out))
     } else {
-      eY <- get_mu(out, X)
+        eY <- get_mu(out, X)
     }
     M <- apply(W, 1, sum)
     eW <- YtoW(eY, M, base)
@@ -30,7 +30,7 @@ XiaPlotWBars <- function(W, X = NULL, out, main = "Composition Fitting Graph", n
         -1
     } ~ (hat(mu)[j]))), side = 2, las = 1, line = 2.5, cex = 2)
     
-    W.m <- Wsim(out = out, W = W, niter = niter)
+    W.m <- Wsim(out = out, W = W, X = X, niter = niter)
     # place bars at every expected value (arbitrary choice 1)
     ePointsL <- apply(W.m, c(1, 2), quantile, probs = c(0.025))
     ePointsH <- apply(W.m, c(1, 2), quantile, probs = c(0.975))

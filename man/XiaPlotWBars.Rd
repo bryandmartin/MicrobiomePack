@@ -4,7 +4,8 @@
 \alias{XiaPlotWBars}
 \title{XiaPlotWBars}
 \usage{
-XiaPlotWBars(W, out, main = "Composition Fitting Graph", niter = 1000)
+XiaPlotWBars(W, X = NULL, out, main = "Composition Fitting Graph",
+  niter = 1000)
 }
 \arguments{
 \item{W}{raw count matrix used in model fit}

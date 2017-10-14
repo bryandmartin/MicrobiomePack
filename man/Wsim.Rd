@@ -4,7 +4,7 @@
 \alias{Wsim}
 \title{Wsim}
 \usage{
-Wsim(out, W, niter = 1000)
+Wsim(out, W, X = NULL, niter = 1000)
 }
 \arguments{
 \item{out}{model fit from LNM.EM}

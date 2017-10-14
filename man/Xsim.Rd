@@ -4,7 +4,7 @@
 \alias{Xsim}
 \title{Xsim}
 \usage{
-Xsim(out, W, niter = 1000)
+Xsim(out, W, X = NULL, niter = 1000)
 }
 \arguments{
 \item{out}{model fit from LNM.EM}

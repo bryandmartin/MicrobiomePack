@@ -14,9 +14,9 @@ Xsim <- function(out, W, X = NULL, niter = 1000) {
     X.m <- array(0, dim = c(N, Q, niter))
     M <- apply(W, 1, sum)
     if (is.null(X)) {
-      mu <- get_mu(out)
+        mu <- get_mu(out)
     } else {
-      mu <- get_mu(out, X)
+        mu <- get_mu(out, X)
     }
     # if can sample from the same mu every time (no covariates)
     if (is.vector(mu)) {

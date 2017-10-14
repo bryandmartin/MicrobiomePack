@@ -11,15 +11,15 @@
 #' @param sub desired subtitle for plot, defaults to MSPE
 #'
 #' @export
-XiaPlotBars <- function(W, X = NULL, out, main = "Composition Fitting Graph", niter = 1000, diagV = FALSE, smallV = FALSE, 
-    sub = FALSE) {
+XiaPlotBars <- function(W, X = NULL, out, main = "Composition Fitting Graph", niter = 1000, diagV = FALSE, 
+    smallV = FALSE, sub = FALSE) {
     N <- nrow(out$Y)
     Q <- ncol(out$Y) + 1
     base <- out$base
     if (is.null(X)) {
-      eY <- tcrossprod(rep(1, N), get_mu(out))
+        eY <- tcrossprod(rep(1, N), get_mu(out))
     } else {
-      eY <- get_mu(out, X)
+        eY <- get_mu(out, X)
     }
     eZ <- YtoX(eY, base)
     Z <- makeComp(W)
@@ -49,7 +49,7 @@ XiaPlotBars <- function(W, X = NULL, out, main = "Composition Fitting Graph", ni
     } else if (sub == FALSE) {
         mtext(paste("(MSPE: ", round(MSPE, 3), ")", sep = ""))
     }
-    X.m <- Xsim(out, W, niter = niter)
+    X.m <- Xsim(out = out, W = W, X = X, niter = niter)
     # place bars at every expected value (arbitrary choice 1)
     eBarY <- eZ[1, ]
     eBarX1 <- apply(X.m, 2, quantile, probs = c(0.025))
@@ -70,16 +70,16 @@ XiaPlotBars <- function(W, X = NULL, out, main = "Composition Fitting Graph", ni
 #' @param sub desired subtitle for plot, defaults to MSPE
 #'
 #' @export
-XiaPlotBarsT <- function(W, X = NULL, out, main = "Composition Fitting Graph", niter = 1000, diagV = FALSE, smallV = FALSE, 
-    sub = FALSE) {
+XiaPlotBarsT <- function(W, X = NULL, out, main = "Composition Fitting Graph", niter = 1000, diagV = FALSE, 
+    smallV = FALSE, sub = FALSE) {
     N <- nrow(out$Y)
     Q <- ncol(out$Y) + 1
     base <- out$base
     eY <- get_mu(out)
     if (is.null(X)) {
-      eY <- tcrossprod(rep(1, N), get_mu(out))
+        eY <- tcrossprod(rep(1, N), get_mu(out))
     } else {
-      eY <- get_mu(out, X)
+        eY <- get_mu(out, X)
     }
     eZ <- YtoX(eY, base)
     Z <- makeComp(W)
@@ -108,7 +108,7 @@ XiaPlotBarsT <- function(W, X = NULL, out, main = "Composition Fitting Graph", n
     } else if (sub == FALSE) {
         mtext(paste("(MSPE: ", round(MSPE, 3), ")", sep = ""))
     }
-    X.m <- Xsim(out, W, niter = niter)
+    X.m <- Xsim(out = out, W = W, X = X, niter = niter)
     # place bars at every expected value (arbitrary choice 1)
     eBarX <- 1:Q
     eBarY1 <- apply(X.m, 2, quantile, probs = c(0.025))

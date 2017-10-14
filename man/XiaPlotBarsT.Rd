@@ -4,8 +4,8 @@
 \alias{XiaPlotBarsT}
 \title{XiaPlotBarsT}
 \usage{
-XiaPlotBarsT(W, out, main = "Composition Fitting Graph", niter = 1000,
-  diagV = FALSE, smallV = FALSE, sub = FALSE)
+XiaPlotBarsT(W, X = NULL, out, main = "Composition Fitting Graph",
+  niter = 1000, diagV = FALSE, smallV = FALSE, sub = FALSE)
 }
 \arguments{
 \item{W}{raw count matrix used in model fit}
