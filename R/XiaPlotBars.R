@@ -18,7 +18,7 @@ XiaPlotBars <- function(W, out, main = "Composition Fitting Graph", niter = 1000
     base <- out$base
     eY <- get_mu(out)
     if (is.vector(eY)) {
-      eY <- tcrossprod(rep(1, N), eY)
+        eY <- tcrossprod(rep(1, N), eY)
     }
     eZ <- YtoX(eY, base)
     Z <- makeComp(W)
@@ -76,7 +76,7 @@ XiaPlotBarsT <- function(W, out, main = "Composition Fitting Graph", niter = 100
     base <- out$base
     eY <- get_mu(out)
     if (is.vector(eY)) {
-      eY <- tcrossprod(rep(1, N), eY)
+        eY <- tcrossprod(rep(1, N), eY)
     }
     eZ <- YtoX(eY, base)
     Z <- makeComp(W)

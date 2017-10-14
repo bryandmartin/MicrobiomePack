@@ -6,10 +6,10 @@
 #'
 #' @export
 get_mu <- function(out, X = NULL) {
-  N <- nrow(out$Y)
-  if (!is.null(out$b)) {
-    return(X %*% out$b + tcrossprod(rep(1, N), out$b0))
-  } else {
-   return(out$b0)
-  }
+    N <- nrow(out$Y)
+    if (!is.null(out$b)) {
+        return(X %*% out$b + tcrossprod(rep(1, N), out$b0))
+    } else {
+        return(out$b0)
+    }
 }

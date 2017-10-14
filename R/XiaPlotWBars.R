@@ -13,7 +13,7 @@ XiaPlotWBars <- function(W, out, main = "Composition Fitting Graph", niter = 100
     base <- out$base
     eY <- get_mu(out)
     if (is.vector(eY)) {
-      eY <- tcrossprod(rep(1, N), eY)
+        eY <- tcrossprod(rep(1, N), eY)
     }
     M <- apply(W, 1, sum)
     eW <- YtoW(eY, M, base)
