@@ -3,7 +3,7 @@
 \name{MicrobiomePack-package}
 \alias{MicrobiomePack-package}
 \alias{MicrobiomePack}
-\title{MicrobiomePack  package documentation.}
+\title{MicrobiomePack package documentation.}
 \description{
 This package provides various methods and tools to analyze microbiome data
 }
