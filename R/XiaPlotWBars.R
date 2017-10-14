@@ -34,8 +34,8 @@ XiaPlotWBars <- function(W, out, main = "Composition Fitting Graph", niter = 100
     points(sqrt(as.vector(W)), sqrt(as.vector(ePointsL)), col = "red", pch = ".")
     points(sqrt(as.vector(W)), sqrt(as.vector(ePointsH)), col = "red", pch = ".")
     points(sqrt(as.vector(W)), sqrt(as.vector(eW)), pch = ".")
-    points(sqrt(as.vector(W))[as.vector(W) > as.vector(ePointsH)], sqrt(as.vector(eW))[as.vector(W) > 
-        as.vector(ePointsH)], pch = 20)
-    points(sqrt(as.vector(W))[as.vector(W) < as.vector(ePointsL)], sqrt(as.vector(eW))[as.vector(W) < 
-        as.vector(ePointsL)], pch = 20)
+    points(sqrt(as.vector(W))[as.vector(W) > as.vector(ePointsH)], sqrt(as.vector(eW))[as.vector(W) > as.vector(ePointsH)], 
+        pch = 20)
+    points(sqrt(as.vector(W))[as.vector(W) < as.vector(ePointsL)], sqrt(as.vector(eW))[as.vector(W) < as.vector(ePointsL)], 
+        pch = 20)
 }

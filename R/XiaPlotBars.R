@@ -11,8 +11,7 @@
 #' @param sub desired subtitle for plot, defaults to MSPE
 #'
 #' @export
-XiaPlotBars <- function(W, out, main = "Composition Fitting Graph", niter = 1000, diagV = FALSE, smallV = FALSE, 
-    sub = FALSE) {
+XiaPlotBars <- function(W, out, main = "Composition Fitting Graph", niter = 1000, diagV = FALSE, smallV = FALSE, sub = FALSE) {
     N <- nrow(out$Y)
     Q <- ncol(out$Y) + 1
     base <- out$base

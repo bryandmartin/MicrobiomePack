@@ -1,9 +1,8 @@
-#' LNM.EM
+#' LNM.EM.nocov
 #'
 #' This function estimates the LNM model fit from Xia et al.
 #' 
 #' @param W count matrix, with OTUs as columns
-#' @param X covariate matrix
 #' @param base OTU index to be used for base
 #' @param EMiter number of EM iterations, defaults to 10
 #' @param EMburn number of EM iterations to burn, defaults to 5
@@ -14,7 +13,8 @@
 #' @param poorman boolean of whether to just use simple diagonal inverse to calculate sigma inverse. Defaults to FALSE
 #'
 #' @export
-LNM.EM <- function(W, X, base, EMiter = 10, EMburn = 5, MCiter = 1000, MCburn = 500, stepsize = 0.01, p = 0.05, poorman = FALSE) {
+LNM.EM.nocov <- function(W, base, EMiter = 10, EMburn = 5, MCiter = 1000, MCburn = 500, stepsize = 0.01, p = 0.05, 
+    poorman = FALSE) {
     # Base is value of D, stepsize is for MH, p is purturb Just take in W, calculate Y, eY, sigma Don't need X yet,
     # those are covariates
     W <- as.matrix(W)
@@ -22,26 +22,19 @@ LNM.EM <- function(W, X, base, EMiter = 10, EMburn = 5, MCiter = 1000, MCburn = 
     ### ROWS COLUMNS N is samples, Q is OTUs
     N <- nrow(W)
     Q <- ncol(W)
-    X <- scale(X)
     # purturbed Y (N x Q-1) - function in getData.R
     Y.p <- logratios(W, base = base, p = p)
     # this is just column means (of OTUs)
     b0 <- attr(Y.p, "center")
-    
-    
-    b <- OLS(X, Y.p)
     # This works only with no covariates Recall tcrossprod is x %*% t(y) N x 1 %*% 1 %*% Q eY is constant across
     # columns
-    eY <- X %*% b + tcrossprod(rep(1, N), b0)
+    eY <- tcrossprod(rep(1, N), b0)
     
     # (Q-1) x (Q-1)
     sigma <- var(Y.p - eY)
     
-    
-    
     #### STORING RESULTS b0's by row of a matrix, rbind
     b0.list <- b0
-    b.list <- b
     # sigma's by arraw, acomb3
     sigma.list <- sigma
     accept.list <- c()
@@ -76,14 +69,11 @@ LNM.EM <- function(W, X, base, EMiter = 10, EMburn = 5, MCiter = 1000, MCburn = 
         
         sigma <- sigSum/(N * (MCiter - MCburn))
         
-        b <- OLS(X, Y.new)
-        
-        eY <- X %*% b + tcrossprod(rep(1, N), b0)
+        eY <- tcrossprod(rep(1, N), b0)
         
         ### STORE after updating
         accept.list <- rbind(accept.list, accepts)
         b0.list <- rbind(b0.list, b0)
-        b.list <- acomb3(b.list, b)
         sigma.list <- acomb3(sigma.list, sigma)
         end <- proc.time()
         cat(end[3] - start[3], "\n")
@@ -93,8 +83,7 @@ LNM.EM <- function(W, X, base, EMiter = 10, EMburn = 5, MCiter = 1000, MCburn = 
     ## inital input
     accept.EM <- colMeans(accept.list[(EMburn):(EMiter), ])
     b0.EM <- colMeans(b0.list[(EMburn + 1):(EMiter + 1), ])
-    b.EM <- apply(b.list[, , (EMburn + 1):(EMiter + 1)], c(1, 2), median)
     sigma.EM <- apply(sigma.list[, , (EMburn + 1):(EMiter + 1)], c(1, 2), mean)
-    return(list(b0 = b0.EM, b = b.EM, sigma = sigma.EM, acceptance = accept.EM, b0.list = b0.list, b.list = b.list, 
-        sigma.list = sigma.list, acceptance.list = accept.list, Y = Y.p, base = base))
+    return(list(mu = b0.EM, sigma = sigma.EM, acceptance = accept.EM, mu.list = b0.list, sigma.list = sigma.list, 
+        acceptance.list = accept.list, Y = Y.p, base = base))
 }

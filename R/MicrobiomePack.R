@@ -9,7 +9,7 @@
 #' @import readr
 #' @import extrafont
 #' @import fontcm
-#' @importFrom MASS mvrnorm
+#' @importFrom MASS mvrnorm ginv
 #' @importFrom parallel detectCores
 #' @import doParallel
 #' @import abind
