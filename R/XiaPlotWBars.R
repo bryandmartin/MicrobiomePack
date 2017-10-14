@@ -8,12 +8,13 @@
 #' @param niter number of simulations for bars, defaults to 1000
 #'
 #' @export
-XiaPlotWBars <- function(W, out, main = "Composition Fitting Graph", niter = 1000) {
+XiaPlotWBars <- function(W, X = NULL, out, main = "Composition Fitting Graph", niter = 1000) {
     N <- nrow(out$Y)
     base <- out$base
-    eY <- get_mu(out)
-    if (is.vector(eY)) {
-        eY <- tcrossprod(rep(1, N), eY)
+    if (is.null(X)) {
+      eY <- tcrossprod(rep(1, N), get_mu(out))
+    } else {
+      eY <- get_mu(out, X)
     }
     M <- apply(W, 1, sum)
     eW <- YtoW(eY, M, base)

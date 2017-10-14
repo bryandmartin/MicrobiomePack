@@ -11,14 +11,15 @@
 #' @param sub desired subtitle for plot, defaults to MSPE
 #'
 #' @export
-XiaPlotBars <- function(W, out, main = "Composition Fitting Graph", niter = 1000, diagV = FALSE, smallV = FALSE, 
+XiaPlotBars <- function(W, X = NULL, out, main = "Composition Fitting Graph", niter = 1000, diagV = FALSE, smallV = FALSE, 
     sub = FALSE) {
     N <- nrow(out$Y)
     Q <- ncol(out$Y) + 1
     base <- out$base
-    eY <- get_mu(out)
-    if (is.vector(eY)) {
-        eY <- tcrossprod(rep(1, N), eY)
+    if (is.null(X)) {
+      eY <- tcrossprod(rep(1, N), get_mu(out))
+    } else {
+      eY <- get_mu(out, X)
     }
     eZ <- YtoX(eY, base)
     Z <- makeComp(W)
@@ -69,14 +70,16 @@ XiaPlotBars <- function(W, out, main = "Composition Fitting Graph", niter = 1000
 #' @param sub desired subtitle for plot, defaults to MSPE
 #'
 #' @export
-XiaPlotBarsT <- function(W, out, main = "Composition Fitting Graph", niter = 1000, diagV = FALSE, smallV = FALSE, 
+XiaPlotBarsT <- function(W, X = NULL, out, main = "Composition Fitting Graph", niter = 1000, diagV = FALSE, smallV = FALSE, 
     sub = FALSE) {
     N <- nrow(out$Y)
     Q <- ncol(out$Y) + 1
     base <- out$base
     eY <- get_mu(out)
-    if (is.vector(eY)) {
-        eY <- tcrossprod(rep(1, N), eY)
+    if (is.null(X)) {
+      eY <- tcrossprod(rep(1, N), get_mu(out))
+    } else {
+      eY <- get_mu(out, X)
     }
     eZ <- YtoX(eY, base)
     Z <- makeComp(W)

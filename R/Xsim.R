@@ -7,14 +7,17 @@
 #' @param niter number of simulations, defaults to 1000
 #'
 #' @export
-Xsim <- function(out, W, niter = 1000) {
+Xsim <- function(out, W, X = NULL, niter = 1000) {
     N <- nrow(out$Y)
     Q <- ncol(out$Y) + 1
     base <- out$base
     X.m <- array(0, dim = c(N, Q, niter))
     M <- apply(W, 1, sum)
-    
-    mu <- get_mu(out)
+    if (is.null(X)) {
+      mu <- get_mu(out)
+    } else {
+      mu <- get_mu(out, X)
+    }
     # if can sample from the same mu every time (no covariates)
     if (is.vector(mu)) {
         for (i in 1:niter) {
