@@ -16,7 +16,10 @@ XiaPlotBars <- function(W, out, main = "Composition Fitting Graph", niter = 1000
     N <- nrow(out$Y)
     Q <- ncol(out$Y) + 1
     base <- out$base
-    eY <- tcrossprod(rep(1, N), out$mu)
+    eY <- get_mu(out)
+    if (is.vector(eY)) {
+      eY <- tcrossprod(rep(1, N), eY)
+    }
     eZ <- YtoX(eY, base)
     Z <- makeComp(W)
     # Mean squared prediction error
@@ -71,7 +74,10 @@ XiaPlotBarsT <- function(W, out, main = "Composition Fitting Graph", niter = 100
     N <- nrow(out$Y)
     Q <- ncol(out$Y) + 1
     base <- out$base
-    eY <- tcrossprod(rep(1, N), out$mu)
+    eY <- get_mu(out)
+    if (is.vector(eY)) {
+      eY <- tcrossprod(rep(1, N), eY)
+    }
     eZ <- YtoX(eY, base)
     Z <- makeComp(W)
     # Mean squared prediction error

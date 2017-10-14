@@ -13,10 +13,22 @@ Wsim <- function(out, W, niter = 1000) {
     base <- out$base
     W.m <- array(0, dim = c(N, Q, niter))
     M <- apply(W, 1, sum)
-    for (i in 1:niter) {
+    mu <- get_mu(out)
+    # if can sample from the same mu every time (no covariates)
+    if (is.vector(mu)) {
+      for (i in 1:niter) {
         # set up Y take mu, sigma, simulate N Y_i's
-        Y.m <- mvrnorm(n = N, mu = out$mu, Sigma = out$sigma)
+        Y.m <- mvrnorm(n = N, mu = mu, Sigma = out$sigma)
         W.m[, , i] <- YtoW(Y = Y.m, M = M, base = base)
+      }
     }
+    if (is.matrix(mu)) {
+      for (i in 1:niter) {
+        # apply out as vector stores as columns, transpose
+        Y.m <- t(apply(mu, 1, function(x) mvrnorm(n = N, mu = x, Sigma = out$sigma)))
+        W.m[, , i] <- YtoW(Y = Y.m, M = M, base = base)
+      }
+    }
+
     return(W.m)
 }

@@ -11,7 +11,10 @@
 XiaPlotWBars <- function(W, out, main = "Composition Fitting Graph", niter = 1000) {
     N <- nrow(out$Y)
     base <- out$base
-    eY <- tcrossprod(rep(1, N), out$mu)
+    eY <- get_mu(out)
+    if (is.vector(eY)) {
+      eY <- tcrossprod(rep(1, N), eY)
+    }
     M <- apply(W, 1, sum)
     eW <- YtoW(eY, M, base)
     # Mean squared prediction error

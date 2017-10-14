@@ -85,6 +85,6 @@ LNM.EM.nocov <- function(W, base, EMiter = 10, EMburn = 5, MCiter = 1000, MCburn
     accept.EM <- colMeans(accept.list[(EMburn):(EMiter), ])
     b0.EM <- colMeans(b0.list[(EMburn + 1):(EMiter + 1), ])
     sigma.EM <- apply(sigma.list[, , (EMburn + 1):(EMiter + 1)], c(1, 2), mean)
-    return(list(mu = b0.EM, sigma = sigma.EM, acceptance = accept.EM, mu.list = b0.list, sigma.list = sigma.list, 
+    return(list(b0 = b0.EM, sigma = sigma.EM, acceptance = accept.EM, b0.list = b0.list, sigma.list = sigma.list, 
         acceptance.list = accept.list, Y = Y.p, base = base))
 }
