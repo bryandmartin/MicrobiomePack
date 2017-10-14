@@ -23,5 +23,5 @@ XiaPlotBars(W, out, main = "Composition Fitting Graph", niter = 1000,
 \item{sub}{desired subtitle for plot, defaults to MSPE}
 }
 \description{
-Function to plot Xia model fit, with empirical 95% bars
+Function to plot Xia model fit, with empirical 95 percent bars
 }

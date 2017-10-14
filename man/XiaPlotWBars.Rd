@@ -16,5 +16,5 @@ XiaPlotWBars(W, out, main = "Composition Fitting Graph", niter = 1000)
 \item{niter}{number of simulations for bars, defaults to 1000}
 }
 \description{
-Function to plot Xia model fit for counts W, with empirical 95% points
+Function to plot Xia model fit for counts W, with empirical 95 percent points
 }

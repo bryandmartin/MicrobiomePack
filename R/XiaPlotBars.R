@@ -1,6 +1,6 @@
 #' XiaPlotBars
 #'
-#' Function to plot Xia model fit, with empirical 95% bars
+#' Function to plot Xia model fit, with empirical 95 percent bars
 #'
 #' @param W raw count matrix used in model fit
 #' @param out model fit from LNM.EM

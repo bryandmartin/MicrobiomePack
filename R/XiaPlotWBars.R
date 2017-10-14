@@ -1,6 +1,6 @@
 #' XiaPlotWBars
 #'
-#' Function to plot Xia model fit for counts W, with empirical 95% points
+#' Function to plot Xia model fit for counts W, with empirical 95 percent points
 #'
 #' @param W raw count matrix used in model fit
 #' @param out model fit from LNM.EM
@@ -10,7 +10,6 @@
 #' @export
 XiaPlotWBars <- function(W, out, main = "Composition Fitting Graph", niter = 1000) {
     N <- nrow(out$Y)
-    Q <- ncol(out$Y) + 1
     base <- out$base
     eY <- tcrossprod(rep(1, N), out$mu)
     M <- apply(W, 1, sum)
