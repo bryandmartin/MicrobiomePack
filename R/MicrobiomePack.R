@@ -1,4 +1,4 @@
-#' MicrobiomePack  package documentation.
+#' MicrobiomePack package documentation.
 #'
 #' This package provides various methods and tools to analyze microbiome data
 #'
