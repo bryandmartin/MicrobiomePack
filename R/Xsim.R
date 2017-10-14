@@ -30,7 +30,7 @@ Xsim <- function(out, W, X = NULL, niter = 1000) {
     if (is.matrix(mu)) {
         for (i in 1:niter) {
             # apply out as vector stores as columns, transpose
-            Y.m <- t(apply(mu, 1, function(x) mvrnorm(n = N, mu = x, Sigma = out$sigma)))
+            Y.m <- t(apply(mu, 1, function(x) mvrnorm(n = 1, mu = x, Sigma = out$sigma)))
             W.m <- YtoW(Y = Y.m, M = M, base = base)
             X.m[, , i] <- makeComp(W.m)
         }
