@@ -55,6 +55,13 @@ XiaPlotBars <- function(W, X = NULL, out, main = "Composition Fitting Graph", ni
     eBarX1 <- apply(X.m, 2, quantile, probs = c(0.025))
     eBarX2 <- apply(X.m, 2, quantile, probs = c(0.975))
     arrows(eBarX1, eBarY, eBarX2, eBarY, col = "red", code = 3, angle = 90, length = 0.01)
+    if (!is.null(X)) {
+      for (i in 1:nrow(eZ)) {
+        eBarY <- eZ[i,]
+        arrows(eBarX1, eBarY, eBarX2, eBarY, col = "red", code = 3, angle = 90, length = 0.01)
+      }
+      points(as.vector(Z), as.vector(eZ), pch = 20)
+    }
 }
 
 #' XiaPlotBarsT
