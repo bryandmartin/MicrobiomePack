@@ -51,16 +51,20 @@ XiaPlotBars <- function(W, X = NULL, out, main = "Composition Fitting Graph", ni
     }
     X.m <- Xsim(out = out, W = W, X = X, niter = niter)
     # place bars at every expected value (arbitrary choice 1)
-    eBarY <- eZ[1, ]
-    eBarX1 <- apply(X.m, 2, quantile, probs = c(0.025))
-    eBarX2 <- apply(X.m, 2, quantile, probs = c(0.975))
-    arrows(eBarX1, eBarY, eBarX2, eBarY, col = "red", code = 3, angle = 90, length = 0.01)
-    if (!is.null(X)) {
-      for (i in 1:nrow(eZ)) {
-        eBarY <- eZ[i,]
+    if (is.null(X)) {
+        eBarY <- eZ[1, ]
+        eBarX1 <- apply(X.m, 2, quantile, probs = c(0.025))
+        eBarX2 <- apply(X.m, 2, quantile, probs = c(0.975))
         arrows(eBarX1, eBarY, eBarX2, eBarY, col = "red", code = 3, angle = 90, length = 0.01)
-      }
-      points(as.vector(Z), as.vector(eZ), pch = 20)
+    }
+    if (!is.null(X)) {
+        eBarX1 <- apply(X.m, c(1, 2), quantile, probs = c(0.025))
+        eBarX2 <- apply(X.m, c(1, 2), quantile, probs = c(0.975))
+        for (i in 1:nrow(eZ)) {
+            eBarY <- eZ[i, ]
+            arrows(eBarX1[i, ], eBarY, eBarX2[i, ], eBarY, col = "red", code = 3, angle = 90, length = 0.01)
+        }
+        points(as.vector(Z), as.vector(eZ), pch = 20)
     }
 }
 
