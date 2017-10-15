@@ -39,8 +39,8 @@ LNM.EM.nocov <- function(W, base, EMiter = 10, EMburn = 5, MCiter = 1000, MCburn
     sigma.list <- sigma
     accept.list <- c()
     
-    # Should be (MCiter x Q x N) (1000 x 75 x 119) Dont forget, first column is acceptance (ie want 74 x
-    # 119 for data)
+    # Should be (MCiter x Q x N) (1000 x 75 x 119) Dont forget, first column is acceptance (ie want 74
+    # x 119 for data)
     for (em in 1:EMiter) {
         cat("EM iteration:", em, "\n")
         start <- proc.time()
@@ -48,8 +48,8 @@ LNM.EM.nocov <- function(W, base, EMiter = 10, EMburn = 5, MCiter = 1000, MCburn
             stepsize = stepsize, poorman = poorman)
         
         # should call 119 apply functions, each time, get 75 means. each of iteration values for OTU.
-        # ORIGINAL for(i in 1:119) { Y.new[i,] <- apply(MCarray[(MCburn+1):MCiter,,i],2,mean) } ALTERNATIVE,
-        # no for loop if large N, but transpose: seems faster by system.time
+        # ORIGINAL for(i in 1:119) { Y.new[i,] <- apply(MCarray[(MCburn+1):MCiter,,i],2,mean) }
+        # ALTERNATIVE, no for loop if large N, but transpose: seems faster by system.time
         Y.new <- t(apply(MCarray[(MCburn + 1):MCiter, , ], 3, colMeans))
         
         # recall first column

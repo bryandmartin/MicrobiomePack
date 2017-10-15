@@ -19,6 +19,7 @@
 #' @import graphics
 #' @import foreach
 #' @importFrom utils globalVariables
+#' @importFrom mvnfast rmvn
 #'
 #' @name MicrobiomePack-package
 #' @aliases MicrobiomePack
