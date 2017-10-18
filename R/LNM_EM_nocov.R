@@ -26,8 +26,8 @@ LNM.EM.nocov <- function(W, base, EMiter = 10, EMburn = 5, MCiter = 1000, MCburn
     Y.p <- logratios(W, base = base, p = p)
     # this is just column means (of OTUs)
     b0 <- attr(Y.p, "center")
-    # This works only with no covariates Recall tcrossprod is x %*% t(y) N x 1 %*% 1 %*% Q eY is
-    # constant across columns
+    # This works only with no covariates Recall tcrossprod is x %*% t(y) N x 1 %*% 1 %*% Q eY is constant
+    # across columns
     eY <- tcrossprod(rep(1, N), b0)
     
     # (Q-1) x (Q-1)
@@ -39,17 +39,17 @@ LNM.EM.nocov <- function(W, base, EMiter = 10, EMburn = 5, MCiter = 1000, MCburn
     sigma.list <- sigma
     accept.list <- c()
     
-    # Should be (MCiter x Q x N) (1000 x 75 x 119) Dont forget, first column is acceptance (ie want 74
-    # x 119 for data)
+    # Should be (MCiter x Q x N) (1000 x 75 x 119) Dont forget, first column is acceptance (ie want 74 x
+    # 119 for data)
     for (em in 1:EMiter) {
         cat("EM iteration:", em, "\n")
         start <- proc.time()
         MCarray <- MCmat(Y = Y.p, W = W, eY = eY, N = N, Q = Q, base = base, sigma = sigma, MCiter = MCiter, 
             stepsize = stepsize, poorman = poorman)
         
-        # should call 119 apply functions, each time, get 75 means. each of iteration values for OTU.
-        # ORIGINAL for(i in 1:119) { Y.new[i,] <- apply(MCarray[(MCburn+1):MCiter,,i],2,mean) }
-        # ALTERNATIVE, no for loop if large N, but transpose: seems faster by system.time
+        # should call 119 apply functions, each time, get 75 means. each of iteration values for OTU.  ORIGINAL
+        # for(i in 1:119) { Y.new[i,] <- apply(MCarray[(MCburn+1):MCiter,,i],2,mean) } ALTERNATIVE, no for loop
+        # if large N, but transpose: seems faster by system.time
         Y.new <- t(apply(MCarray[(MCburn + 1):MCiter, , ], 3, colMeans))
         
         # recall first column
@@ -59,9 +59,9 @@ LNM.EM.nocov <- function(W, base, EMiter = 10, EMburn = 5, MCiter = 1000, MCburn
         # update beta, sigma Recall: b0 is means across OTUs
         b0 <- apply(Y.new, 2, mean)
         
-        # sigSums <- matrix(0,Q-1,Q-1) # Get all sample matrices for(i in (MCburn+1):MCiter) { # first part
-        # is Y sample Eps.samp <- t(MCarray[i,2:Q,1:N]) - eY sigSums <- sigSums + crossprod(Eps.samp) } CAN
-        # EASILY MAKE ABOVE APPLY: next just take mean
+        # sigSums <- matrix(0,Q-1,Q-1) # Get all sample matrices for(i in (MCburn+1):MCiter) { # first part is
+        # Y sample Eps.samp <- t(MCarray[i,2:Q,1:N]) - eY sigSums <- sigSums + crossprod(Eps.samp) } CAN EASILY
+        # MAKE ABOVE APPLY: next just take mean
         sigSumFun <- function(i) {
             return(crossprod(t(MCarray[i, 2:Q, 1:N]) - eY))
         }
@@ -80,8 +80,8 @@ LNM.EM.nocov <- function(W, base, EMiter = 10, EMburn = 5, MCiter = 1000, MCburn
         cat(end[3] - start[3], "\n")
     }
     
-    ## Next: take average of EM samples past burn. Included init, so have EMiter+1 total Note, below
-    ## doesn't have any inital input
+    ## Next: take average of EM samples past burn. Included init, so have EMiter+1 total Note, below doesn't
+    ## have any inital input
     accept.EM <- colMeans(accept.list[(EMburn):(EMiter), ])
     b0.EM <- colMeans(b0.list[(EMburn + 1):(EMiter + 1), ])
     sigma.EM <- apply(sigma.list[, , (EMburn + 1):(EMiter + 1)], c(1, 2), mean)
