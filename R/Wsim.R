@@ -5,9 +5,10 @@
 #' @param out model fit from LNM.EM
 #' @param W raw count matrix used in model fit
 #' @param niter number of simulations, defaults to 1000
+#' @param fast whether or not to simulate from diagonal sigma with rmvn
 #'
 #' @export
-Wsim <- function(out, W, X = NULL, niter = 1000) {
+Wsim <- function(out, W, X = NULL, niter = 1000, fast = FALSE) {
     N <- nrow(out$Y)
     Q <- ncol(out$Y) + 1
     base <- out$base
@@ -22,14 +23,22 @@ Wsim <- function(out, W, X = NULL, niter = 1000) {
     if (is.vector(mu)) {
         for (i in 1:niter) {
             # set up Y take mu, sigma, simulate N Y_i's
+          if (fast == TRUE) {
             Y.m <- rmvn(n = N, mu = mu, sigma = diag(diag(out$sigma)))
+          } else {
+            Y.m <- mvrnorm(n = N, mu = mu, Sigma = out$sigma)
+          }
             W.m[, , i] <- YtoW(Y = Y.m, M = M, base = base)
         }
     }
     if (is.matrix(mu)) {
         for (i in 1:niter) {
+          if (fast == TRUE) {
             # apply out as vector stores as columns, transpose
             Y.m <- t(apply(mu, 1, function(x) rmvn(n = 1, mu = x, sigma = diag(diag(out$sigma)))))
+          } else {
+            Y.m <- t(apply(mu, 1, function(x) mvrnorm(n = 1, mu = x, sigma = out$sigma)))
+          }
             W.m[, , i] <- YtoW(Y = Y.m, M = M, base = base)
         }
     }
