@@ -9,10 +9,11 @@
 #' @param diagV boolean of whether to use diagonal Sigma for simulations, defaults to FALSE
 #' @param smallV boolean of whether to use diagonal Sigma with very small entries for simulations, defaults to false
 #' @param sub desired subtitle for plot, defaults to MSPE
+#' @param fast whether to simulate for bars using fast method or not
 #'
 #' @export
 XiaPlotBars <- function(W, X = NULL, out, main = "Composition Fitting Graph", niter = 1000, diagV = FALSE, 
-    smallV = FALSE, sub = FALSE) {
+    smallV = FALSE, sub = FALSE, fast = FALSE) {
     N <- nrow(out$Y)
     Q <- ncol(out$Y) + 1
     base <- out$base
@@ -49,7 +50,7 @@ XiaPlotBars <- function(W, X = NULL, out, main = "Composition Fitting Graph", ni
     } else if (sub == FALSE) {
         mtext(paste("(MSPE: ", round(MSPE, 3), ")", sep = ""))
     }
-    X.m <- Xsim(out = out, W = W, X = X, niter = niter)
+    X.m <- Xsim(out = out, W = W, X = X, niter = niter, fast = fast)
     # place bars at every expected value (arbitrary choice 1)
     if (is.null(X)) {
         eBarY <- eZ[1, ]
