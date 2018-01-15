@@ -24,9 +24,9 @@ LNM.EM <- function(W, X, base, EMiter = 10, EMburn = 5, MCiter = 1000, MCburn = 
     N <- nrow(W)
     Q <- ncol(W)
     # Check for intercept, scaling means shouldn't need
-    checkInt <- function(x) all(x == 1)
+    checkInt <- function(x) !all(x == 1)
     IntInd <- apply(X, 2, checkInt)
-    X <- X[,-IntInd]
+    X <- X[,IntInd]
       
     X <- scale(X)
     # purturbed Y (N x Q-1) - function in getData.R
