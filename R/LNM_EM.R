@@ -2,8 +2,8 @@
 #'
 #' This function estimates the LNM model fit from Xia et al.
 #' 
-#' @param W count matrix, with OTUs as columns
-#' @param X covariate matrix
+#' @param formula Formula for model. Make sure your response is of cbind form as in binomial glm
+#' @param data data frame object
 #' @param base OTU index to be used for base
 #' @param EMiter number of EM iterations, defaults to 10
 #' @param EMburn number of EM iterations to burn, defaults to 5
@@ -14,11 +14,23 @@
 #' @param poorman boolean of whether to just use simple diagonal inverse to calculate sigma inverse. Defaults to FALSE
 #'
 #' @export
-LNM.EM <- function(W, X, base, EMiter = 10, EMburn = 5, MCiter = 1000, MCburn = 500, stepsize = 0.01, p = 0.05, 
+LNM.EM <- function(formula, data, base, EMiter = 10, EMburn = 5, MCiter = 1000, MCburn = 500, stepsize = 0.01, p = 0.05, 
     poorman = FALSE) {
-    # Base is value of D, stepsize is for MH, p is purturb Just take in W, calculate Y, eY, sigma Don't
+    
+  
+    # Don't use intercept in formula 
+  if (formula != ~1) {
+    formula <- stats::update.formula(formula, ~ . - 1)
+  }
+  
+  W <- stats::model.response(stats::model.frame(formula = formula, data = data))
+  
+  # mu model matrix
+  X <- stats::model.matrix(object = formula, data = dat)
+  
+  # Base is value of D, stepsize is for MH, p is purturb Just take in W, calculate Y, eY, sigma Don't
     # need X yet, those are covariates
-    W <- as.matrix(W)
+    #W <- as.matrix(W)
     
     ### ROWS COLUMNS N is samples, Q is OTUs
     N <- nrow(W)
