@@ -2,7 +2,6 @@
 
 ## Description of Files (10/6)
 
-* **Master Folder:** This folder contains the full LaTeX for generating the master pdf. It is intended for personal use to track changes and keep a backup.
 * **XiaChenFungLiModel.R:** Complete implementaion of the MC-EM model from Xia et al. (2013)
 * **XiaTestRun.R:** Imports other scripts and demonstrates how to run the MC-EM function. Also includes code for generating the fitting graphs, as in Figure 4 Xia et al.
 * **getData.R:** Loads in raw data files provided by Amy. Includes functions to purturb, take logratio, and select most prevelent OTUs.
