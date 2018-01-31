@@ -37,7 +37,7 @@ LNM.EM <- function(W, X, base, EMiter = 10, EMburn = 5, MCiter = 1000, MCburn = 
   
   b <- OLS(X, Y.p)
   if (is.null(dim(b))) {
-    b <- matrix(b)
+    b <- t(matrix(b))
   }
   # This works only with no covariates Recall tcrossprod is x %*% t(y) N x 1 %*% 1 %*% Q eY is constant
   # across columns
@@ -88,7 +88,7 @@ LNM.EM <- function(W, X, base, EMiter = 10, EMburn = 5, MCiter = 1000, MCburn = 
     
     b <- OLS(X, Y.new)
     if (is.null(dim(b))) {
-      b <- matrix(b)
+      b <- t(matrix(b))
     }
     
     eY <- X %*% b + tcrossprod(rep(1, N), b0)
