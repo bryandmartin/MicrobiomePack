@@ -28,7 +28,7 @@ MCrow <- function(Yi, Wi, eYi, Q, base, sigInv, MCiter, stepsize = 1) {
         acceptance <- min(1, exp(fullRat))
         temp <- runif(1)
         aVal <- 0
-        if (temp < acceptance) {
+        if (temp < acceptance | is.nan(acceptance)) {
             Yi <- Yi.star
             aVal <- 1
         }
